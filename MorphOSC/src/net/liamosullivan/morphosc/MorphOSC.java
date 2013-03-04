@@ -50,8 +50,9 @@ implements PConstants
 	private boolean isMoving = false, isResizing = false, isOver = false; 
 	private int movingLayer=0, resizeLayer =0, overLayer =0;
 	private boolean isDraggingMParameter =  false; //true if a MorphParam is being dragged
-	private boolean isDraggingMPValue =  false; //true if a MorphParam vlaue is being dragged
+	private boolean isDraggingMPValue =  false; //true if a MorphParam value is being dragged
 	private int draggingMParam = 0, draggingMPValue = 0; //id of MP or MP value being dragged
+	private float mpValue = 0.0F;
 	private PVector mouseVector = new PVector(0,0);
 
 
@@ -313,7 +314,9 @@ implements PConstants
 			parent.rect(mV.x,mV.y,vzSize.x,vzSize.y); //show rect being dragged with MP color stroke
 		}
 
-
+		parent.rectMode(CORNER);
+		
+			
 	}
 
 	public void mouseEvent(MouseEvent e_)
@@ -389,6 +392,7 @@ implements PConstants
 					System.out.println(" MorphParameter value "+mp.getId()+" selected");
 					isDraggingMPValue = true;
 					draggingMPValue = i;
+					mpValue= cList.get(i).getValue(); //get the value from the controller
 					keepChecking = false;
 
 				}
@@ -453,15 +457,49 @@ implements PConstants
 			isDraggingMParameter = false;
 		}
 		if (isDraggingMPValue) {
+			boolean keepChecking=true;
 			MorphParameter mpVDrag = mpList.get(draggingMPValue);
+			//check if mouse released over any layers
 			for(int i=0;i<mlList.size();i+=1){
 				MorphLayer ml = mlList.get(i);
 				if(ml.select(v)){
-//					ml.addMorphAnchor(mpVDrag);				 //To Do: add MP to layer if not already there (check exists)
-				//need to keep ids of MPs in layer and modify the correct value
-				System.out.println("MorphAnchor to be added to Layer "+i);
+					List a = ml.getMPList();
+					//first, add the MP to the layers MP list if it isn't already there.
+					if(!a.contains(mpVDrag)){
+						System.out.println("MorphParameter to be added to Layer "+i);
+						ml.addMorphParameter(mpVDrag);
+					}
+					//second, now the MP is added to the layer, so add the value to an anchor
+					//check if there are anchors in the layer
+					if(ml.getMAList()!=null){
+						//check if over an existing anchor
+						List <MorphAnchor> maL= ml.getMAList();
+						for(int j=0;i<maL.size()&& keepChecking ;i+=1){
+							MorphAnchor ma = maL.get(i);
+							if(ma.select(v)){
+								//if over an anchor, set the value of the appropriate MP
+								ma.setMorphParameterValue(mpVDrag.getId(), mpValue );
+								keepChecking=false;
+							}
+						}
+						//if not over an anchor AND there are other anchors, need to create a new anchor
+						//As anchor must contain all MPs for Layer, need to find values for other MPs at the
+						//new anchor point
+						if(keepChecking){
+							MorphAnchor maNew = new MorphAnchor(ml.getNMAs(), v); //TODO: find interpolated values for all parameters at new anchor
+							ml.addMorphAnchor(maNew);
+						}
+
+					}
+					//if there are no anchors in the layer, can just add an anchor and set the appropriate MP
+					else{
+						MorphAnchor maNew = new MorphAnchor(ml.getNMAs(), v);
+						maNew.setMorphParameterValue(mpVDrag.getId(), mpValue);
+						ml.addMorphAnchor(maNew);
+					}
 				}
 			}
+			
 			isDraggingMPValue = false;
 		}
 

@@ -11,10 +11,11 @@ public class MorphLayer extends InteractiveLayer
 {
 	PApplet parentApplet;
 	List<MorphParameter> mpList = new ArrayList();
+	private int nMPs = 0; //number of MPs currently in layer
 	List<MorphAnchor> maList = new ArrayList();
-	int nMorphAnchors = 0;
+	int nMAs = 0; //number of MAs currently in layer
 	List<Float> distances = new ArrayList();
-	int nmps;
+
 	PFont font;
 	PFont boldFont;
 	int textH = 22;
@@ -31,16 +32,26 @@ public class MorphLayer extends InteractiveLayer
 	{
 		MorphParameter mp = mp_;
 		if(!mpList.contains(mp)){
-		this.mpList.add(mp);
-		System.out.println("MorphParam "+mp.getId()+" added to layer "+ this.id);
+			this.mpList.add(mp);
+			System.out.println("MorphParam "+mp.getId()+" added to layer "+ this.id);
 		}
 		else{
-		System.out.println("MorphParam "+mp.getId()+" already in layer "+ this.id);
+			System.out.println("MorphParam "+mp.getId()+" already in layer "+ this.id);
 		}
 	}
 
 	public void removeMorphParameter(int idRemove_) {
 		int idRemove = idRemove_;
+	}
+
+	public List getMPList(){
+
+		return mpList;
+	}
+
+	public int getNMPs(){
+
+		return nMAs;
 	}
 
 	public void addMorphAnchor(MorphAnchor ma_)
@@ -58,7 +69,15 @@ public class MorphLayer extends InteractiveLayer
 		int ix = ix_;
 		int iy = iy_;
 	}
-	
+	List getMAList(){
+		return maList;	
+
+	}
+	public int getNMAs(){
+
+		return nMAs;
+	}
+
 	void displayInterp() {
 		this.parentApplet.pushMatrix();
 		this.parentApplet.translate(this.lx, this.ly);
@@ -83,7 +102,7 @@ public class MorphLayer extends InteractiveLayer
 	}
 
 	float[] interpolate(PVector p_) {
-		
+
 		PVector P = p_;
 		float[] iParams = new float[4];
 
@@ -121,7 +140,15 @@ public class MorphLayer extends InteractiveLayer
 		return W;
 	}
 
-	public void showInfo()
+	@Override
+	public void displaySpecial()
 	{
+		//show anchors
+		for(int i =0;i<maList.size();i+=1){
+			MorphAnchor ma = maList.get(i);
+			parent.fill(255,255,255,200);
+			parent.ellipse(ma.p.x, ma.p.y, 10, 10); //draw a circle at the anchor point
+			parent.noFill();
+		}
 	}
 }

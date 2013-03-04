@@ -159,7 +159,7 @@ implements PConstants
 		yRelative = (parent.mouseY - ly);
 	}
 
-	void display()
+	public void display()
 	{
 		//System.out.println("Display Layer called");
 		parent.colorMode(HSB, 255.0F);
@@ -177,7 +177,6 @@ implements PConstants
 			parent.noStroke();
 		}
 		
-
 		if (isOverHandle) {
 			//System.out.println("Showing Handle");
 			parent.stroke(sColour);
@@ -201,13 +200,17 @@ implements PConstants
 			parent.fill(fColour);
 		}
 		parent.rect(lx, ly, lWidth, lHeight);    //draw main layer
+		
+		
+		
 		parent.fill(fColour);
 		parent.rect(lx, (float)(ly - halfHeight + 0.5D * barH), lWidth, barH); //draw top window bar
 		if (showInfo)
-			showInfo();
+			displaySpecial();
 	}
 
-	void showInfo()
-	{
+	void displaySpecial(){
+		//placeholder- implemented in subclass
 	}
+	
 }

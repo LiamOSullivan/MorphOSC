@@ -2,6 +2,7 @@ package net.liamosullivan.morphosc;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.lang.Math;
 import processing.core.PVector;
 
 public class MorphAnchor
@@ -9,9 +10,8 @@ public class MorphAnchor
 	List<MorphParameter> mpList = new ArrayList<MorphParameter>();
 	List<Float> valueList = new ArrayList<Float>();
 	int id;
-	PVector p;
-
-	float s = 20.0F;
+	PVector p; //position
+	float s = 20.0F; //arbitrary size (for boundary checking)
 
 	MorphAnchor(int id_, PVector p_)
 	{
@@ -46,11 +46,16 @@ public class MorphAnchor
 		return -1;
 
 	}
-	public void setMorphParameterValue(int index_, float val_){
-		int i = index_;
+	public void setMorphParameterValue(int id_, float val_){
+		int idP = id_; //the id of the parameter in question
 		float val = val_;
-		valueList.set(i, val);
-
+		int index=-1;
+		for(int i=0;i<mpList.size();i+=1){
+			if(mpList.get(i).getId()==idP){
+				index=i;
+			}
+		}
+		valueList.set(index, val);
 	}
 
 	public void setMorphParameterValue(String name_){
@@ -58,11 +63,26 @@ public class MorphAnchor
 
 	}
 
-	public void over()
-	{
+	boolean select(PVector pv_) {
+
+		PVector pv=pv_;
+		//		if ((pv.x > p.x ) && (pv.x < x + width) && 
+		//				(pv.y > p.y ) && (pv.y < y + height))
+		float disX = p.x- pv.x;
+		float disY = p.y- pv.y;
+		if (Math.sqrt(disX*disX + disY*disY) < s/2) { //check circular area
+
+			return true;
+		}
+
+		return false;
 	}
 
 	public void move(PVector p_)
 	{
+	}
+
+	public void display(){
+
 	}
 }
