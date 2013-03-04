@@ -33,10 +33,12 @@ public class Zone {
 		parent=parent_;
 		width=size_.x;
 		height=size_.y;
+		this.size=size_;
 		halfWidth=width;
 		halfHeight=height;
 		x=pos_.x;
 		y=pos_.y;
+		this.pos=pos_;
 
 	}
 
@@ -62,8 +64,8 @@ public class Zone {
 
 	boolean select(PVector pv_) {
 		PVector pv=pv_;
-		if ((pv.x > x - halfWidth) && (pv.x < x + halfWidth) && 
-				(pv.y > y - halfHeight) && (pv.y < y + halfHeight))
+		if ((pv.x > x ) && (pv.x < x + width) && 
+				(pv.y > y ) && (pv.y < y + height))
 		{
 			return true;
 		}

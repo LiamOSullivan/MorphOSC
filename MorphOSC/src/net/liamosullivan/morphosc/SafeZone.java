@@ -17,7 +17,7 @@ public class SafeZone extends Zone {
 
 	}
 	void display(){
-		
+		parent.rect(this.x,this.y,this.width,this.height);
 		
 	}
 	

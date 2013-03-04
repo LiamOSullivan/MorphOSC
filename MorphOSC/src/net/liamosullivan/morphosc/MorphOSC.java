@@ -49,8 +49,9 @@ implements PConstants
 	public boolean showMenu = false;
 	private boolean isMoving = false, isResizing = false, isOver = false; 
 	private int movingLayer=0, resizeLayer =0, overLayer =0;
-	private int draggingMParam = 0;
 	private boolean isDraggingMParameter =  false; //true if a MorphParam is being dragged
+	private boolean isDraggingMPValue =  false; //true if a MorphParam vlaue is being dragged
+	private int draggingMParam = 0, draggingMPValue = 0; //id of MP or MP value being dragged
 	private PVector mouseVector = new PVector(0,0);
 
 
@@ -85,7 +86,7 @@ implements PConstants
 			lockX=parent.width-(unlocked.width/2);
 			lockY=unlocked.height/2;
 		}
-
+		//SafeZones for GUI elements
 		sZoneList.add(new SafeZone(parent, nSafeZones, lockX, lockY,(float)locked.width/2, (float)locked.height/2));
 		nSafeZones+=1;
 
@@ -241,13 +242,13 @@ implements PConstants
 
 	}
 
-	protected void update(ControlEvent e)
+	protected void updateController(ControlEvent e)
 	{
 		if (e.isGroup()) {
 			System.out.println("Got group event in container");
 		}
 		else if (e.isController())
-			System.out.println("Control event in container from " + e.getController().getName());
+			System.out.println("Control event in MorphOSC from " + e.getController().getName());
 	}
 
 	public void getControllerInfo()
@@ -287,12 +288,14 @@ implements PConstants
 		}
 		parent.stroke(255,200);
 		parent.noFill();
+		parent.rectMode(CORNER);
 		for(int i =0 ;i<nSafeZones;i+=1){
 			SafeZone sfz = sZoneList.get(i);
 			sfz.display(); //display the safe zones around controllers (MLayers etc won't be created over SafeZones)
 
 		}
 		parent.noStroke();
+		parent.rectMode(CENTER);
 
 		if (isDraggingMParameter) {
 			MorphParameter mpDrag = mpList.get(draggingMParam);
@@ -300,6 +303,14 @@ implements PConstants
 			PVector mV = getMouseVector();
 			parent.fill(mpDrag.getColor()); 
 			parent.rect(mV.x,mV.y,szSize.x,szSize.y); //show rect being dragged with MP color
+		}
+		if (isDraggingMPValue) {
+			MorphParameter mpDrag = mpList.get(draggingMPValue);
+			PVector vzSize = mpDrag.getValueZone().getSize();
+			PVector mV = getMouseVector();
+			parent.noFill();
+			parent.stroke(mpDrag.getColor()); 
+			parent.rect(mV.x,mV.y,vzSize.x,vzSize.y); //show rect being dragged with MP color stroke
 		}
 
 
@@ -370,6 +381,18 @@ implements PConstants
 
 				}
 			}
+			//Check if over a ValueZone (GUI elements in MorphParamater objects that hold the current MP value)
+			for (int i = 0; i< nMParams && keepChecking; i+=1) { 
+				MorphParameter mp = mpList.get(i);
+				ValueZone vlz = mp.getValueZone();
+				if (vlz.select(v)) {
+					System.out.println(" MorphParameter value "+mp.getId()+" selected");
+					isDraggingMPValue = true;
+					draggingMPValue = i;
+					keepChecking = false;
+
+				}
+			}
 			//
 			for (int i = nMLayers-1 ; i >=0 && keepChecking; i--) { //check from top drawn layer downwards
 				MorphLayer tl = mlList.get(i);
@@ -418,7 +441,7 @@ implements PConstants
 	private void mouseReleased(PVector v_){
 		PVector v = v_;
 		setMouseVector(v);
-		
+
 		if (isDraggingMParameter) {
 			MorphParameter mpDrag = mpList.get(draggingMParam);
 			for(int i=0;i<mlList.size();i+=1){
@@ -429,13 +452,25 @@ implements PConstants
 			}
 			isDraggingMParameter = false;
 		}
-		
+		if (isDraggingMPValue) {
+			MorphParameter mpVDrag = mpList.get(draggingMPValue);
+			for(int i=0;i<mlList.size();i+=1){
+				MorphLayer ml = mlList.get(i);
+				if(ml.select(v)){
+//					ml.addMorphAnchor(mpVDrag);				 //To Do: add MP to layer if not already there (check exists)
+				//need to keep ids of MPs in layer and modify the correct value
+				System.out.println("MorphAnchor to be added to Layer "+i);
+				}
+			}
+			isDraggingMPValue = false;
+		}
+
 		if (isResizing) {
 			MorphLayer tl = mlList.get(resizeLayer);
 			isResizing = false;
 		}
 		isMoving = false;
-		
+
 
 		//TODO: make this more efficient by keeping track of dragged layers rather than brute force
 		for (int i=0; i<mlList.size();i+=1) {
@@ -532,6 +567,7 @@ implements PConstants
 		return mouseVector;
 
 	}
+
 
 	public void keyEvent(KeyEvent e)
 	{

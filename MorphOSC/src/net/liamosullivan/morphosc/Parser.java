@@ -32,6 +32,7 @@ public class Parser
     mp.setSize(new PVector(c.getWidth(), c.getHeight()));
     mp.setPosition(c.getPosition());
     mp.setSelectZone();
+    mp.setValueZone();
     //mp.addSafeZone();
     return mp;
   }

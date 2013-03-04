@@ -1,6 +1,7 @@
 package net.liamosullivan.morphosc;
 
 import processing.core.PVector;
+import processing.core.PConstants;
 import processing.core.PApplet;
 
 public class MorphParameter
@@ -14,12 +15,13 @@ public class MorphParameter
 	float mn;
 	float lastValue;
 	int c;
-	PVector p; //position
-	PVector size; //size
+	PVector p; //position of original controller
+	PVector size; //size of original controller
 	SelectZone slz;
+	ValueZone vlz;
 	SafeZone sfz;
 	private PVector szPosition;
-	private int padding  = 10;
+	private int padding  = 20;
 
 	MorphParameter(PApplet par_, int id_, String name_)
 	{
@@ -101,12 +103,25 @@ public class MorphParameter
 
 	void setSelectZone(){
 
-		slz = new SelectZone(parent, (float)(this.p.x + this.size.x + padding), (float)(p.y + this.size.y*0.5),
-				(float)padding*2, (float)padding*2);
+		slz = new SelectZone(parent, (float)(this.p.x + this.size.x + padding), (float)(p.y - this.size.y*0.5),
+				(float)padding, (float)padding);
 
 	}
+	
 	SelectZone getSelectZone(){
 		return slz;
+		
+	}
+	
+	void setValueZone(){
+
+		vlz = new ValueZone(parent, (float)(this.p.x - 2*padding), (float)(p.y - this.size.y*0.5),
+				(float)padding, (float)padding);
+
+	}
+	
+	ValueZone getValueZone(){
+		return vlz;
 		
 	}
 //	void addSafeZone(){
@@ -118,12 +133,17 @@ public class MorphParameter
 
 	void display(){
 		//Display a colour swatch next to controller at SelectZone 
+		parent.rectMode(0); //0 for CORNER, 3 for CENTER
 		parent.noStroke();
 		parent.fill(this.c);
 		slz.display();
+		parent.stroke(this.c);
+		parent.noFill();
+		vlz.display();
+		parent.rectMode(3); //0 for CORNER, 3 for CENTER
 //		parent.stroke(255,200);
-//		parent.noFill();
-//		sfz.display();
+////		parent.noFill();
+//sfz.display();
 //		parent.noStroke();
 		//parent.rect(sz.szx, sz.szy, sz.size.x, sz.size.x);  
 	}
