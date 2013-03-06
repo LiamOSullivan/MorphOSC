@@ -57,6 +57,8 @@ public class MorphLayer extends InteractiveLayer
 	public void addMorphAnchor(MorphAnchor ma_)
 	{
 		MorphAnchor ma = ma_;
+		PVector av = ma.getPosition();
+		ma.setPosition(new PVector (av.x-lx, av.y-ly)); //correct anchor position position relative to layer axes
 		this.maList.add(ma);
 	}
 
@@ -139,9 +141,35 @@ public class MorphLayer extends InteractiveLayer
 		}
 		return W;
 	}
+	//methods to control specific elements contained in MorphLayer 
+	
+//	@Override
+//	public void setContentsStartPos(PVector mv_)
+//	{
+//
+//		PVector mv=mv_;
+//		for(int i =0;i<maList.size();i+=1){
+//		MorphAnchor ma = maList.get(i);
+//		//ma.setStartPosition(mv);
+//		}
+//		//placeholder- implemented in subclass
+//	}
+//	
+//	@Override
+//	public void moveContents(PVector mv_)
+//	{
+//		PVector mv=mv_;
+//		for(int i =0;i<maList.size();i+=1){
+//		MorphAnchor ma = maList.get(i);
+//		ma.move(mv);
+//		
+//	}
+//	
+//	}
+//	
 
 	@Override
-	public void displaySpecial()
+	public void displayContents()
 	{
 		//show anchors
 		for(int i =0;i<maList.size();i+=1){

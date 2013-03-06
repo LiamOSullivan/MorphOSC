@@ -67,14 +67,14 @@ implements PConstants
 		handleY = new float[noOfHandles];
 		halfWidth = (lWidth / 2);
 		halfHeight = (lHeight / 2);
-		handleX[0] = (lx - halfWidth);
-		handleY[0] = (ly - halfHeight);
-		handleX[1] = (lx + halfWidth);
-		handleY[1] = (ly - halfHeight);
-		handleX[2] = (lx - halfWidth);
-		handleY[2] = (ly + halfHeight);
-		handleX[3] = (lx + halfWidth);
-		handleY[3] = (ly + halfHeight);
+		handleX[0] = (- halfWidth);
+		handleY[0] = (- halfHeight);
+		handleX[1] = (halfWidth);
+		handleY[1] = (- halfHeight);
+		handleX[2] = (- halfWidth);
+		handleY[2] = (halfHeight);
+		handleX[3] = (halfWidth);
+		handleY[3] = (halfHeight);
 	}
 
 	boolean select(PVector pv_) {
@@ -93,8 +93,8 @@ implements PConstants
 		PVector v=v_;
 		boolean selected = false;
 		for (int i = 0; (i < noOfHandles) && (!selected); i++) {
-			float disX = handleX[i] - v.x;
-			float disY = handleY[i] - v.y;
+			float disX = lx + handleX[i] - v.x;
+			float disY = ly + handleY[i] - v.y;
 			if (PApplet.sqrt(PApplet.sq(disX) + PApplet.sq(disY)) < handleSize / 2.0F) {
 				handleId = i;
 				PApplet.println("HandleId " + handleId);
@@ -126,13 +126,31 @@ implements PConstants
 		// offset = dist(v, position);
 		xOffset = (v.x - lx);
 		yOffset = (v.y - ly);
+		
+	}
+	public void setContentsStartPos(PVector mv_)
+	{
+		//placeholder- implemented in subclass
 	}
 
+	public PVector getPosition(){
+		
+		return new PVector(lx,ly);
+	
+	}
+	
 	public void move(PVector v_)
 	{ PVector v=v_;
 	lx = (v.x - xOffset);
 	ly = (v.y - yOffset);
+	moveContents(new PVector(lx,ly));
 	createHandles();
+	}
+	
+	
+	public void moveContents(PVector mv_)
+	{
+		//placeholder- implemented in subclass
 	}
 
 	void resize(PVector v_)
@@ -199,17 +217,17 @@ implements PConstants
 			parent.text(id + ": (" + xRelative + ", " + yRelative + ")", parent.mouseX, parent.mouseY + 12 * id);
 			parent.fill(fColour);
 		}
-		parent.rect(lx, ly, lWidth, lHeight);    //draw main layer
+		parent.rect(0, 0, lWidth, lHeight);    //draw main layer
 		
 		
 		
 		parent.fill(fColour);
-		parent.rect(lx, (float)(ly - halfHeight + 0.5D * barH), lWidth, barH); //draw top window bar
+		parent.rect(0, (float)(-halfHeight + 0.5D * barH), lWidth, barH); //draw top window bar
 		if (showInfo)
-			displaySpecial();
+			displayContents();
 	}
 
-	void displaySpecial(){
+	void displayContents(){
 		//placeholder- implemented in subclass
 	}
 	
