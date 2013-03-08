@@ -40,9 +40,9 @@ public class MorphOSC implements PConstants {
 
 	// Setup options
 	public boolean addLayersFromGUI = true; // add MorphLayers at runtime with
-											// GUI interaction
+	// GUI interaction
 	public boolean highlightControllers = true; // color controllers added as
-												// MorphParameters
+	// MorphParameters
 
 	// Interaction flags
 	public boolean guiIsLocked = false;
@@ -50,11 +50,11 @@ public class MorphOSC implements PConstants {
 	private boolean isMoving = false, isResizing = false, isOver = false;
 	private int movingLayer = 0, resizeLayer = 0, overLayer = 0;
 	private boolean isDraggingMParameter = false; // true if a MorphParam is
-													// being dragged
+	// being dragged
 	private boolean isDraggingMPValue = false; // true if a MorphParam value is
-												// being dragged
+	// being dragged
 	private int draggingMParam = 0, draggingMPValue = 0; // id of MP or MP value
-															// being dragged
+	// being dragged
 	private float mpValue = 0.0F;
 	private PVector mouseVector = new PVector(0, 0);
 
@@ -75,6 +75,7 @@ public class MorphOSC implements PConstants {
 		parent.registerMethod("dispose", this);
 		parent.registerMethod("mouseEvent", this);
 		parent.registerMethod("keyEvent", this);
+
 	}
 
 	private void initGUI() {
@@ -162,8 +163,8 @@ public class MorphOSC implements PConstants {
 			mp.setId(nMParams);
 			mpList.add(mp);
 			nMParams += 1;
-			sZoneList.add(new SafeZone(parent, nSafeZones, mp.getPosition(), mp
-					.getSize()));
+			sZoneList.add(new SafeZone(parent, nSafeZones, mp.getPosition(), 
+					mp.getSize()));
 			nSafeZones += 1;
 		} else {
 			System.out.println("Can't add Controller, maximum reached");
@@ -248,13 +249,7 @@ public class MorphOSC implements PConstants {
 
 	}
 
-	protected void updateController(ControlEvent e) {
-		if (e.isGroup()) {
-			System.out.println("Got group event in container");
-		} else if (e.isController())
-			System.out.println("Control event in MorphOSC from "
-					+ e.getController().getName());
-	}
+
 
 	public void getControllerInfo() {
 		for (int i = 0; i < cList.size(); i++) {
@@ -267,6 +262,19 @@ public class MorphOSC implements PConstants {
 					+ "\t Name: " + name);
 			System.out.println("\t Address: " + add + "\t Value: " + val);
 		}
+	}
+
+	private int findMPIndexById(int fid_){
+		int fid = fid_;
+		int index;
+		MorphParameter mp;
+		for(int i =0; i<mpList.size();i+=1){
+			mp = mpList.get(i);
+			if(mp.getId()==fid){
+				return i;	
+			}
+		}
+		return -1;
 	}
 
 	public void pre() {
@@ -285,7 +293,7 @@ public class MorphOSC implements PConstants {
 		for (int i = 0; i < mlList.size(); i += 1) {
 			MorphLayer ml = mlList.get(i);
 
-			System.out.println("Layer position: " + ml.getPosition());
+			//System.out.println("Layer position: " + ml.getPosition());
 			parent.pushMatrix();
 			parent.translate(ml.getPosition().x, ml.getPosition().y);
 			ml.display();
@@ -306,7 +314,7 @@ public class MorphOSC implements PConstants {
 		for (int i = 0; i < nSafeZones; i += 1) {
 			SafeZone sfz = sZoneList.get(i);
 			sfz.display(); // display the safe zones around controllers (MLayers
-							// etc won't be created over SafeZones)
+			// etc won't be created over SafeZones)
 
 		}
 		parent.noStroke();
@@ -318,8 +326,8 @@ public class MorphOSC implements PConstants {
 			PVector mV = getMouseVector();
 			parent.fill(mpDrag.getColor());
 			parent.rect(mV.x, mV.y, szSize.x, szSize.y); // show rect being
-															// dragged with MP
-															// color
+			// dragged with MP
+			// color
 		}
 		if (isDraggingMPValue) {
 			MorphParameter mpDrag = mpList.get(draggingMPValue);
@@ -328,8 +336,8 @@ public class MorphOSC implements PConstants {
 			parent.noFill();
 			parent.stroke(mpDrag.getColor());
 			parent.rect(mV.x, mV.y, vzSize.x, vzSize.y); // show rect being
-															// dragged with MP
-															// color stroke
+			// dragged with MP
+			// color stroke
 		}
 
 		parent.rectMode(CORNER);
@@ -338,35 +346,34 @@ public class MorphOSC implements PConstants {
 
 	public void mouseEvent(MouseEvent e_)
 
-	{
-		MouseEvent e = e_;
-		PVector v = new PVector(e.getX(), e.getY());
-		// System.out.println("mouseEvent() called with action "+e.getAction());
-		switch (e.getAction()) {
+	{	MouseEvent e = e_;
+	PVector v = new PVector(e.getX(), e.getY());
+	// System.out.println("mouseEvent() called with action "+e.getAction());
+	switch (e.getAction()) {
 
-		case MouseEvent.PRESS:
-			mousePressed(v);
-			break;
-		case MouseEvent.RELEASE:
-			mouseReleased(v);
-			break;
-		case MouseEvent.CLICK:
-			mouseClicked(v);
-			break;
-		case MouseEvent.DRAG:
-			mouseDragged(v);
-			break;
-		case MouseEvent.MOVE:
-			mouseMoved(v);
-			break;
-		}
+	case MouseEvent.PRESS:
+		mousePressed(v);
+		break;
+	case MouseEvent.RELEASE:
+		mouseReleased(v);
+		break;
+	case MouseEvent.CLICK:
+		mouseClicked(v);
+		break;
+	case MouseEvent.DRAG:
+		mouseDragged(v);
+		break;
+	case MouseEvent.MOVE:
+		mouseMoved(v);
+		break;
+	}
 	}
 
 	private void mousePressed(PVector v_) {
 		PVector v = v_;
 		setMouseVector(v);
 		if (guiIsLocked) { // Gestures cause interpolated output when GUI is
-							// locked
+			// locked
 			boolean keepChecking = true;
 			for (int i = nMLayers - 1; i >= 0 && keepChecking; i--) {
 				MorphLayer tl = mlList.get(i);
@@ -384,11 +391,11 @@ public class MorphOSC implements PConstants {
 			// Check if over a SafeZone (GUI elements which exist in MorphOSC
 			// object)
 			for (int i = 0; i < nSafeZones && keepChecking; i += 1) { // check
-																		// from
-																		// top
-																		// drawn
-																		// layer
-																		// downwards
+				// from
+				// top
+				// drawn
+				// layer
+				// downwards
 				SafeZone sz = sZoneList.get(i);
 				if (sz.select(v)) {
 					System.out.println("Safe Zone " + i + " selected");
@@ -421,18 +428,18 @@ public class MorphOSC implements PConstants {
 					isDraggingMPValue = true;
 					draggingMPValue = i;
 					mpValue = cList.get(i).getValue(); // get the value from the
-														// controller
+					// controller
 					keepChecking = false;
 
 				}
 			}
 			//
 			for (int i = nMLayers - 1; i >= 0 && keepChecking; i--) { // check
-																		// from
-																		// top
-																		// drawn
-																		// layer
-																		// downwards
+				// from
+				// top
+				// drawn
+				// layer
+				// downwards
 				MorphLayer tl = mlList.get(i);
 				if (tl.selectHandle(v)) {
 					System.out.println(" Layer " + i + " Handle selected");
@@ -502,8 +509,8 @@ public class MorphOSC implements PConstants {
 					// already there.
 					if (!a.contains(mpVDrag)) {
 						System.out
-								.println("MorphParameter to be added to Layer "
-										+ i);
+						.println("MorphParameter to be added to Layer "
+								+ i);
 						ml.addMorphParameter(mpVDrag);
 					}
 					// second, now the MP is added to the layer, so add the
@@ -529,15 +536,15 @@ public class MorphOSC implements PConstants {
 						// new anchor point
 						if (keepChecking) {
 							MorphAnchor maNew = new MorphAnchor(ml.getNMAs(), v); // TODO:
-																					// find
-																					// interpolated
-																					// values
-																					// for
-																					// all
-																					// parameters
-																					// at
-																					// new
-																					// anchor
+							// find
+							// interpolated
+							// values
+							// for
+							// all
+							// parameters
+							// at
+							// new
+							// anchor
 							ml.addMorphAnchor(maNew);
 						}
 
@@ -581,7 +588,7 @@ public class MorphOSC implements PConstants {
 		setMouseVector(v);
 		if (guiIsLocked) {
 			for (int i = nMLayers - 1; i >= 0; i--) { // check from front layer
-														// backwards
+				// backwards
 				MorphLayer tl = mlList.get(i);
 				if (tl.select(v)) {
 					// println("Left Dragging on Layer "+i);
@@ -616,10 +623,10 @@ public class MorphOSC implements PConstants {
 		setMouseVector(v);
 		boolean keepChecking = true;
 		for (int i = nMLayers - 1; i >= 0 && keepChecking; i--) { // check from
-																	// frontmost
-																	// drawn
-																	// layer
-																	// backwards
+			// frontmost
+			// drawn
+			// layer
+			// backwards
 			MorphLayer tl = mlList.get(i);
 			if (tl.selectHandle(v)) {
 				System.out.println("Over handle " + tl.handleId
@@ -662,6 +669,30 @@ public class MorphOSC implements PConstants {
 	}
 
 	public void dispose() {
+	}
+
+	public void controlEvent(ControlEvent e){
+
+		System.out.println("Control event in MorphOSC from "
+				+ e.getController().getName());
+		System.out.println("Controller no. is "
+				+ e.getController().getId());
+
+		int index = findMPIndexById(e.getController().getId());
+		System.out.println("...index is "+index);
+		if(e.isController()	&& index >= 0){
+			mpList.get(index).setVZValue(e.getController().getValue());
+		}
+	}
+
+	protected void updateController(ControlEvent e) {
+
+
+		int index = findMPIndexById(e.getController().getId());
+		if(index!=-1){
+
+
+		}
 	}
 
 }

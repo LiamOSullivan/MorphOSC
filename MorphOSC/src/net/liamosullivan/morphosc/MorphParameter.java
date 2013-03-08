@@ -39,7 +39,7 @@ public class MorphParameter
 	int getId() {
 		return this.id;
 	}
-	
+
 	void setName(String n_)
 	{
 		this.name = n_;
@@ -71,6 +71,7 @@ public class MorphParameter
 
 	void setValue(float v_) {
 		this.value = v_;
+		setVZValue(value);
 	}
 
 	int getColor() {
@@ -101,35 +102,39 @@ public class MorphParameter
 	{
 	}
 
-	void setSelectZone(){
+	void addSelectZone(){
 
-		slz = new SelectZone(parent, (float)(this.p.x - 2*padding), (float)(p.y),
+		slz = new SelectZone(parent, (float)(this.p.x - padding), (float)(p.y),
 				(float)padding, (float)this.size.y);
 
 	}
-	
+
 	SelectZone getSelectZone(){
 		return slz;
-		
-	}
-	
-	void setValueZone(){
 
+	}
+
+	protected void addValueZone(){
 		vlz = new ValueZone(parent, (float)(this.p.x + this.size.x+padding), p.y,
 				padding*1.5F, (float)this.size.y, value);
 
 	}
 	
-	ValueZone getValueZone(){
+	protected ValueZone getValueZone(){
 		return vlz;
 		
 	}
-//	void addSafeZone(){
-//
-//		sfz = new SafeZone(parent, (float)(this.p.x), (float)(p.y),
-//				(float)padding*2, (float)padding*2);
-//
-//	}
+
+	protected float getVZValue(){
+		return value;
+
+	}
+
+	protected void setVZValue(float v_){
+		vlz.setValue(v_);
+
+	}
+
 
 	void display(){
 		//Display a colour swatch next to controller at SelectZone 
@@ -141,12 +146,6 @@ public class MorphParameter
 		parent.noFill();
 		vlz.display();
 		parent.rectMode(3); //0 for CORNER, 3 for CENTER
-		
-//		parent.stroke(255,200);
-////		parent.noFill();
-//sfz.display();
-//		parent.noStroke();
-		//parent.rect(sz.szx, sz.szy, sz.size.x, sz.size.x);  
 	}
 
 }

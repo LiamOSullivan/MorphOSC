@@ -3,6 +3,7 @@ package net.liamosullivan.morphosc;
 import processing.core.PApplet;
 import processing.core.PVector;
 
+
 public class SelectZone extends Zone {
 
 	SelectZone(PApplet parent_, float x_, float y_, float w_, float h_){
@@ -10,7 +11,8 @@ public class SelectZone extends Zone {
 
 	}
 	void display(){
-		parent.rect(this.x,this.y,this.width,this.height);
+		parent.ellipseMode(parent.CORNER);
+		parent.ellipse(this.x,this.y,this.width,this.height);
 	}
 
 }

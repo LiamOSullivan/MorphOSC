@@ -25,15 +25,18 @@ public class Parser
     int color = color_;
     MorphParameter mp = 
       new MorphParameter(this.parent, c.getId(), c.getName()); //getId() here may be returning -1
-    mp.setValue(c.getValue());
-    mp.setMax(c.getMax());
-    mp.setMin(c.getMin());
-    mp.setColor(color);
     mp.setSize(new PVector(c.getWidth(), c.getHeight()));
     mp.setPosition(c.getPosition());
-    mp.setSelectZone();
-    mp.setValueZone();
-    //mp.addSafeZone();
+    mp.setColor(color);
+    mp.addValueZone();
+    mp.addSelectZone();
+    mp.setMax(c.getMax());
+    mp.setMin(c.getMin());
+    mp.setValue(c.getValue());
+    
+    
+    
+   
     return mp;
   }
 }

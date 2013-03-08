@@ -201,6 +201,7 @@ implements PConstants
 			parent.stroke(sColour);
 			parent.textFont(font, dialogTextSize);
 			parent.fill(fColour);
+			parent.ellipseMode(parent.CENTER);
 			parent.ellipse(handleX[handleId], handleY[handleId], handleSize, handleSize);
 			if (verboseDisplay) {
 				parent.fill(255);
