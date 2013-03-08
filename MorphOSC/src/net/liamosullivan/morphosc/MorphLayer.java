@@ -169,13 +169,26 @@ public class MorphLayer extends InteractiveLayer
 //	
 
 	@Override
+	public void resizeContents()
+	{
+		for(int i =0;i<maList.size();i+=1){
+			MorphAnchor ma = maList.get(i);
+			
+		}
+		
+	
+	}
+	
+	@Override
 	public void displayContents()
 	{
 		//show anchors
 		for(int i =0;i<maList.size();i+=1){
 			MorphAnchor ma = maList.get(i);
 			parent.fill(255,255,255,200);
-			parent.ellipse(ma.p.x, ma.p.y, 10, 10); //draw a circle at the anchor point
+			parent.ellipse(ma.getPosition().x, ma.getPosition().y, 10, 10); //draw a circle at the anchor point
+			parent.textSize(12);
+			parent.text(""+ma.getPosition().x + ma.getPosition().y, ma.getPosition().x, ma.getPosition().y);
 			parent.noFill();
 		}
 	}

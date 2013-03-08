@@ -2,6 +2,7 @@ package net.liamosullivan.morphosc;
 
 import processing.core.PVector;
 import processing.core.PApplet;
+import processing.core.PConstants;
 public class Zone {
 	PApplet parent;
 	int id;
@@ -10,41 +11,44 @@ public class Zone {
 	private PVector pos;
 	protected float width;
 	protected float height;
-	private PVector size;
-	private float halfWidth;
-	private float halfHeight;
+	protected PVector size;
+//	private float halfWidth;
+//	private float halfHeight;
 
 	Zone(PApplet parent_, float x_, float y_, float w_, float h_)
 	{
 
-		parent=parent_;
-		width=w_;
-		height=h_;
-		size = new PVector(width, height);
-		halfWidth=width/2;
-		halfHeight=height/2;
-		x=x_;
-		y=y_;
-		pos = new PVector(x, y);
+		this.parent=parent_;
+		this.width=w_;
+		this.height=2*h_;
+		this.size = new PVector(width, height);
+//		halfWidth=width/2;
+//		halfHeight=height/2;
+		this.x=x_;
+		this.y=y_-h_/4; //correct for drawing controls at corners
+		this.pos = new PVector(x, y);
 
 	}
 	Zone(PApplet parent_, PVector pos_, PVector size_)
 	{
-		parent=parent_;
-		width=size_.x;
-		height=size_.y;
-		this.size=size_;
-		halfWidth=width;
-		halfHeight=height;
-		x=pos_.x;
-		y=pos_.y;
+		this.parent=parent_;
+		this.size = new PVector();
+		this.size.x= size_.x;
+		this.size.y= 2*size_.y;
+		this.width=size.x;
+		this.height=size.y;
+//		halfWidth=width;
+//		halfHeight=height;
+		this.x=pos_.x;
+		this.y=pos_.y-size.y/4; //correct for drawing controls at corners
 		this.pos=pos_;
 
 	}
 
 	void setPosition(PVector p_){
 
-		this.pos = p_;
+		this.pos.x = p_.x;
+		this.pos.y = p_.y-this.size.y/4;
 	}
 
 	PVector getPosition(){
@@ -54,7 +58,8 @@ public class Zone {
 
 	void setSize(PVector p_){
 
-		this.size = p_;
+		this.size.x = p_.x;
+		this.size.y = p_.y*2;
 	}
 
 	PVector getSize(){

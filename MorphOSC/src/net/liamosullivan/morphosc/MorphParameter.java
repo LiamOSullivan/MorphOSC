@@ -103,8 +103,8 @@ public class MorphParameter
 
 	void setSelectZone(){
 
-		slz = new SelectZone(parent, (float)(this.p.x - 2*padding), (float)(p.y - this.size.y*0.5),
-				(float)padding, (float)padding);
+		slz = new SelectZone(parent, (float)(this.p.x - 2*padding), (float)(p.y),
+				(float)padding, (float)this.size.y);
 
 	}
 	
@@ -115,8 +115,8 @@ public class MorphParameter
 	
 	void setValueZone(){
 
-		vlz = new ValueZone(parent, (float)(this.p.x + this.size.x+padding), p.y - this.size.y*0.5F,
-				padding*1.5F, (float)padding);
+		vlz = new ValueZone(parent, (float)(this.p.x + this.size.x+padding), p.y,
+				padding*1.5F, (float)this.size.y, value);
 
 	}
 	

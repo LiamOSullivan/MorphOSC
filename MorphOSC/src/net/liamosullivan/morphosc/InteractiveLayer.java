@@ -39,7 +39,7 @@ implements PConstants
 	int barY;
 	PFont font;
 	int dialogTextSize = 12; int layerTextSize = 28;
-	boolean verboseDisplay = false; boolean showInfo = true;
+	boolean verboseDisplay = false; boolean displayContents = true;
 	boolean isOverHandle = false; boolean isOverLayer = false; boolean isOverLayerBar = false; boolean isDraggingOnLayer = false;
 
 	InteractiveLayer(PApplet p_, int id_, int x_, int y_, int width_, int height_, int fC_, int sC_, int dispW_, int dispH_)
@@ -126,7 +126,7 @@ implements PConstants
 		// offset = dist(v, position);
 		xOffset = (v.x - lx);
 		yOffset = (v.y - ly);
-		
+
 	}
 	public void setContentsStartPos(PVector mv_)
 	{
@@ -134,11 +134,11 @@ implements PConstants
 	}
 
 	public PVector getPosition(){
-		
+
 		return new PVector(lx,ly);
-	
+
 	}
-	
+
 	public void move(PVector v_)
 	{ PVector v=v_;
 	lx = (v.x - xOffset);
@@ -146,8 +146,8 @@ implements PConstants
 	moveContents(new PVector(lx,ly));
 	createHandles();
 	}
-	
-	
+
+
 	public void moveContents(PVector mv_)
 	{
 		//placeholder- implemented in subclass
@@ -162,6 +162,7 @@ implements PConstants
 		halfWidth = ((float)(lWidth / 2.0D));
 		halfHeight = ((float)(lHeight / 2.0D));
 		createHandles();
+		resizeContents();
 	}
 
 	void rotate()
@@ -185,7 +186,7 @@ implements PConstants
 		parent.textAlign(LEFT);
 		parent.textFont(font, layerTextSize);
 		parent.fill(fColour);
-		parent.text(id, lx + halfWidth - layerTextSize, ly - halfHeight + barH);
+		parent.text(id, halfWidth-layerTextSize, halfHeight-layerTextSize/2);
 		parent.fill(fColour);
 
 		if (isOverLayerBar) {
@@ -194,7 +195,7 @@ implements PConstants
 		else {
 			parent.noStroke();
 		}
-		
+
 		if (isOverHandle) {
 			//System.out.println("Showing Handle");
 			parent.stroke(sColour);
@@ -218,17 +219,19 @@ implements PConstants
 			parent.fill(fColour);
 		}
 		parent.rect(0, 0, lWidth, lHeight);    //draw main layer
-		
-		
-		
+
 		parent.fill(fColour);
 		parent.rect(0, (float)(-halfHeight + 0.5D * barH), lWidth, barH); //draw top window bar
-		if (showInfo)
+		if (displayContents)
 			displayContents();
 	}
 
 	void displayContents(){
 		//placeholder- implemented in subclass
 	}
-	
+
+	void resizeContents(){
+		//placeholder- implemented in subclass
+	}
+
 }

@@ -89,7 +89,7 @@ public class MorphOSC implements PConstants {
 		}
 		// SafeZones for GUI elements
 		sZoneList.add(new SafeZone(parent, nSafeZones, lockX, lockY,
-				(float) locked.width / 2, (float) locked.height / 2));
+				(float) locked.width / 2, (float) locked.height / 2)); //GUI lock
 		nSafeZones += 1;
 
 	}
