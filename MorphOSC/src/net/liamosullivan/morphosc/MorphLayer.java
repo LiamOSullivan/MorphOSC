@@ -21,11 +21,14 @@ public class MorphLayer extends InteractiveLayer
 	int textH = 22;
 	int ptSize = 10;
 	float PSize = 40.0F;
+	int mpSwatchSize;
+	int anchorTextSize = 20;
 	boolean movePoint = false;
 
 	MorphLayer(PApplet p_, int id_, int x_, int y_, int w_, int h_, int fC_, int sC_, int dispW_, int dispH_)
 	{
 		super(p_, id_, x_, y_, w_, h_, fC_, sC_, dispW_, dispH_);
+		mpSwatchSize= barH-10;
 	}
 
 	public void addMorphParameter(MorphParameter mp_)
@@ -34,9 +37,11 @@ public class MorphLayer extends InteractiveLayer
 		if(!mpList.contains(mp)){
 			this.mpList.add(mp);
 			System.out.println("MorphParam "+mp.getId()+" added to layer "+ this.id);
+			System.out.println("Current Value is "+mp.getValue());
 		}
 		else{
 			System.out.println("MorphParam "+mp.getId()+" already in layer "+ this.id);
+			System.out.println("Current Value is "+mp.getValue());
 		}
 	}
 
@@ -59,7 +64,10 @@ public class MorphLayer extends InteractiveLayer
 		MorphAnchor ma = ma_;
 		PVector av = ma.getPosition();
 		ma.setPosition(new PVector (av.x-lx, av.y-ly)); //correct anchor position position relative to layer axes
+		//ma.setMorphParameterValueById(id_, val_);
 		this.maList.add(ma);
+		System.out.println("MorphAnchor "+ma.getId()+" added to layer "+ this.id);
+		
 	}
 
 	public void removeMorphAnchor()
@@ -141,55 +149,48 @@ public class MorphLayer extends InteractiveLayer
 		}
 		return W;
 	}
-	//methods to control specific elements contained in MorphLayer 
-	
-//	@Override
-//	public void setContentsStartPos(PVector mv_)
-//	{
-//
-//		PVector mv=mv_;
-//		for(int i =0;i<maList.size();i+=1){
-//		MorphAnchor ma = maList.get(i);
-//		//ma.setStartPosition(mv);
-//		}
-//		//placeholder- implemented in subclass
-//	}
-//	
-//	@Override
-//	public void moveContents(PVector mv_)
-//	{
-//		PVector mv=mv_;
-//		for(int i =0;i<maList.size();i+=1){
-//		MorphAnchor ma = maList.get(i);
-//		ma.move(mv);
-//		
-//	}
-//	
-//	}
-//	
 
 	@Override
 	public void resizeContents()
 	{
 		for(int i =0;i<maList.size();i+=1){
 			MorphAnchor ma = maList.get(i);
-			
+
 		}
-		
-	
+
+
 	}
-	
+
 	@Override
 	public void displayContents()
 	{
+		//show MorphParameters
+		parent.fill(255,255,255,200);
+		parent.noStroke();
+		for(int i =0;i<mpList.size();i+=1){
+			MorphParameter mp = mpList.get(i);
+			parent.rect((i+1)*barH-halfWidth,-halfHeight + 0.5F * barH,  mpSwatchSize, mpSwatchSize);
+			parent.textSize(20);
+			parent.text(""+mp.getId(), (i+1)*barH-halfWidth,-halfHeight); //place MP swatches on top bar
+
+		}
+		parent.noFill();
+		parent.textSize(anchorTextSize);
+		parent.ellipseMode(CENTER);
 		//show anchors
 		for(int i =0;i<maList.size();i+=1){
 			MorphAnchor ma = maList.get(i);
 			parent.fill(255,255,255,200);
 			parent.ellipse(ma.getPosition().x, ma.getPosition().y, 10, 10); //draw a circle at the anchor point
-			parent.textSize(12);
-			parent.text(""+ma.getPosition().x + ma.getPosition().y, ma.getPosition().x, ma.getPosition().y);
-			parent.noFill();
+			//parent.text(""+ma.getPosition().x + ma.getPosition().y, ma.getPosition().x, ma.getPosition().y); 
+			for(int j=0;j<ma.valueList.size();j+=1){ //TODO: change to method getValueList
+				parent.stroke(255,255,255,200);
+//				parent.text("*", ma.getPosition().x, ma.getPosition().y+(i*anchorTextSize)); 
+				parent.text(ma.getMPValueByIndex(j), ma.getPosition().x, ma.getPosition().y+(j*anchorTextSize)); 
+				//TODO: get rid of valueList and just use MPs, as there is an mpList for each anchor 
+				//that can hold 'current' value
+			}
+
 		}
 	}
 }

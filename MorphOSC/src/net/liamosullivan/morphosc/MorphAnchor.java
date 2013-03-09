@@ -22,6 +22,16 @@ public class MorphAnchor
 		this.p = p_;
 	}
 
+	void setId(int id_)
+	{
+		this.id = id_;
+	}
+
+	float getId() {
+		return this.id;
+	}
+
+	
 	void setSize(float s_)
 	{
 		this.s = s_;
@@ -39,26 +49,54 @@ public class MorphAnchor
 	return this.p;	
 	
 	}
+	
+	protected List getMPList(){
+		
+		return mpList;
+	}
 
 	public void addMorphParameter(MorphParameter mp_)
 	{
+		MorphParameter mp=mp_;
+		mpList.add(mp);
+		valueList.add(mp.getValue());
+		System.out.print("Added MP to MorphAnchor's mpList, now has size "+mpList.size());
+		System.out.println("| Value added was "+valueList.get(valueList.size()-1));
 	}
 
 	public void removeMorphParameter()
 	{
 	}
 
-	public float getMorphParameterValue(int index_){
+	public float getMPValueByIndex(int index_){
 
 		return valueList.get(index_);
 
 	}
-	public float getMorphParameterValue(String name_){
+	public float getMPValueById(int id_){
+		int idP = id_; //the id of the parameter in question
+		int index=-1;
+		for(int i=0;i<mpList.size();i+=1){
+			if(mpList.get(i).getId()==idP){
+				index=i;
+			}
+		}
+		if(index!=-1){
+		valueList.get(index);
+		return valueList.get(index);
+		}
+		else{
+			return -1;
+		}
+
+	}
+	
+	public float getMPValueByName(String name_){
 		//TO DO: implement parameter value getting via parameter name 
 		return -1;
 
 	}
-	public void setMorphParameterValue(int id_, float val_){
+	public void setMorphParameterValueById(int id_, float val_){
 		int idP = id_; //the id of the parameter in question
 		float val = val_;
 		int index=-1;

@@ -10,7 +10,7 @@ public class MorphParameter
 	int id;
 	String name;
 	String address;
-	float value;
+	float value; //the 'current' value
 	float mx;
 	float mn;
 	float lastValue;

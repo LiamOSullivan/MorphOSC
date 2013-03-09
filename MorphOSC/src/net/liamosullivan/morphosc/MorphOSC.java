@@ -423,12 +423,13 @@ public class MorphOSC implements PConstants {
 				MorphParameter mp = mpList.get(i);
 				ValueZone vlz = mp.getValueZone();
 				if (vlz.select(v)) {
-					System.out.println(" MorphParameter value " + mp.getId()
+					System.out.println(" MorphParameter value id" + mp.getId()
 							+ " selected");
 					isDraggingMPValue = true;
 					draggingMPValue = i;
 					mpValue = cList.get(i).getValue(); // get the value from the
 					// controller
+					//System.out.println(" MPValue is:  " + mpValue);
 					keepChecking = false;
 
 				}
@@ -497,65 +498,146 @@ public class MorphOSC implements PConstants {
 			}
 			isDraggingMParameter = false;
 		}
+		// dragging a MP value box to a layer...
 		if (isDraggingMPValue) {
 			boolean keepChecking = true;
 			MorphParameter mpVDrag = mpList.get(draggingMPValue);
+			mpVDrag.setValue(mpValue);
+			//System.out.println("Value of mpVDrag is "+mpValue);
 			// check if mouse released over any layers
 			for (int i = 0; i < mlList.size(); i += 1) {
 				MorphLayer ml = mlList.get(i);
 				if (ml.select(v)) {
-					List a = ml.getMPList();
-					// first, add the MP to the layers MP list if it isn't
-					// already there.
-					if (!a.contains(mpVDrag)) {
-						System.out
-						.println("MorphParameter to be added to Layer "
-								+ i);
+					//Get mpList and maList list for the layer(s)
+					ArrayList mpl = (ArrayList)ml.getMPList();
+					ArrayList mal = (ArrayList)ml.getMAList();
+					//1. new MP is NOT in layer, there are NO MPs in Layer, there are NO anchors
+					//add new MP to layer, add MP to new MA, add MA to Layer
+					if (!mpl.contains(mpVDrag)&& mpl.size()==0 && mal.size()==0) {
+						//						System.out
+						//						.println("MorphParameter to be added to Layer "
+						//								+ i);
 						ml.addMorphParameter(mpVDrag);
-					}
-					// second, now the MP is added to the layer, so add the
-					// value to an anchor
-					// check if there are anchors in the layer
-					if (ml.getMAList() != null) {
-						// check if over an existing anchor
-						List<MorphAnchor> maL = ml.getMAList();
-						for (int j = 0; i < maL.size() && keepChecking; i += 1) {
-							MorphAnchor ma = maL.get(i);
-							if (ma.select(v)) {
-								// if over an anchor, set the value of the
-								// appropriate MP
-								ma.setMorphParameterValue(mpVDrag.getId(),
-										mpValue);
-								keepChecking = false;
-							}
-						}
-						// if not over an anchor AND there are other anchors,
-						// need to create a new anchor
-						// As anchor must contain all MPs for Layer, need to
-						// find values for other MPs at the
-						// new anchor point
-						if (keepChecking) {
-							MorphAnchor maNew = new MorphAnchor(ml.getNMAs(), v); // TODO:
-							// find
-							// interpolated
-							// values
-							// for
-							// all
-							// parameters
-							// at
-							// new
-							// anchor
-							ml.addMorphAnchor(maNew);
-						}
+						//No MPs means no existing anchors, so just
+						//Add an anchor and add the MP and value to it...
+						MorphAnchor maNew = new MorphAnchor(mal.size(), v); //id and position vector
+						maNew.addMorphParameter(mpVDrag);
+						maNew.setMorphParameterValueById(mpVDrag.getId(), mpValue);
+						ml.addMorphAnchor(maNew); //adds MA to maList
+						//						System.out
+						//						.println("MorphAnchor to be added to Layer "
+						//								+ i);
 
 					}
-					// if there are no anchors in the layer, can just add an
-					// anchor and set the appropriate MP
-					else {
-						MorphAnchor maNew = new MorphAnchor(ml.getNMAs(), v);
-						maNew.setMorphParameterValue(mpVDrag.getId(), mpValue);
-						ml.addMorphAnchor(maNew);
+
+					//2. new MP is NOT in layer, there ARE MPs in Layer, there are NO anchors 
+					//add new MP to layer, add existing MPs (with values) to new anchor, add anchor 
+					else if (!mpl.contains(mpVDrag) && mpl.size()>0 && mal.size()==0){
+						ml.addMorphParameter(mpVDrag); 
+						MorphAnchor maNew = new MorphAnchor(mal.size(), v);
+						//System.out.println("Adding existing MPs to new Anchor");
+						for(int j=0;j<mpl.size();j+=1){
+							MorphParameter mpExists = (MorphParameter)mpl.get(j);  //TODO: get rid of cast
+							maNew.addMorphParameter(mpExists);
+							maNew.setMorphParameterValueById(mpExists.getId(),mpExists.getValue()); //TODO: determine how to set values of MPs with existing MAs
+						}
+						ml.addMorphAnchor(maNew); //adds MA to maList
 					}
+
+					//3. new MP is NOT in layer, there ARE MPs in Layer, there are ARE anchors 
+					//add new MP, add existing MPs to new MA, update all MAs with new MP, add MA 
+					else if (!mpl.contains(mpVDrag) && mpl.size()>0 && mal.size()>0){
+						ml.addMorphParameter(mpVDrag); 
+						MorphAnchor maNew = new MorphAnchor(mal.size(), v);
+						for(int j=0;j<mpl.size();j+=1){
+							MorphParameter mpExists = (MorphParameter)mpl.get(j);  //TODO: get rid of cast
+							maNew.addMorphParameter(mpExists);
+							maNew.setMorphParameterValueById(mpExists.getId(),mpExists.getValue()); //TODO: determine how to set values of MPs with existing MAs
+							System.out.println("Existing MP #"+mpExists.getId()+" has value "+mpExists.getValue());
+						}						
+						for(int j=0;j<mal.size();j+=1){
+							MorphAnchor a = (MorphAnchor)mal.get(j);
+							ArrayList ampl = (ArrayList) a.getMPList();
+							if(!ampl.contains(mpVDrag)){   //TODO: does contains work okay here? What about values?
+								a.addMorphParameter(mpVDrag);
+								
+							}
+//							for(int k=0;k<ampl.size();i+=1){
+//								MorphParameter amp = (MorphParameter) ampl.get(k);
+//								if(amp.getId()!= mpVDrag.getId()){
+////
+//								}
+//							}
+
+						}
+
+						ml.addMorphAnchor(maNew); //adds MA to maList
+
+
+					}
+					//					//if MP already in layer, but no anchors present, need to  
+					//					//Add an anchor and add the MP and value to it...
+					//					else if (mpl.contains(mpVDrag) && mal.size()==0){
+					//						
+					//						MorphAnchor maNew = new MorphAnchor(mal.size()-1, v);
+					//						maNew.addMorphParameter(mpVDrag);
+					//						maNew.setMorphParameterValueById(mpVDrag.getId(), mpValue);
+					//						ml.addMorphAnchor(maNew); //adds MA to maList
+					//												
+					//					}
+					//					//if new MP in layer, just add a new anchor
+					//					else if (mpl.contains(mpVDrag) && mal.size()>0){
+					//						MorphAnchor maNew = new MorphAnchor(mal.size()-1, v);
+					//						maNew.addMorphParameter(mpVDrag);
+					//						maNew.setMorphParameterValueById(mpVDrag.getId(), mpValue);
+					//						ml.addMorphAnchor(maNew); //adds MA to maList
+					//									
+					//					}
+					//					
+
+
+					//					// second, now the MP is added to the layer, so add the
+					//					// value to an anchor
+					//					// check if there are anchors in the layer
+					//					if (ml.getMAList().size() > 0) {
+					//						// check if over an existing anchor
+					//						//System.out.println("maList has elements");
+					//						List<MorphAnchor> maL = ml.getMAList();
+					//						for (int j = 0; i < maL.size() && keepChecking; i += 1) {
+					//							MorphAnchor ma = maL.get(i);
+					//							if (ma.select(v)) {
+					//								// if over an anchor, set the value of the
+					//								// appropriate MP
+					//								ma.setMorphParameterValueById(mpVDrag.getId(),
+					//										mpValue);
+					//								keepChecking = false;
+					//							}
+					//						}
+					//						// if not over an anchor AND there are other anchors,
+					//						// need to create a new anchor
+					//						// As anchor must contain all MPs for Layer, need to
+					//						// find values for other MPs at the
+					//						// new anchor point
+					//						if (keepChecking) {
+					//							MorphAnchor maNew = new MorphAnchor(ml.getNMAs(), v); // TODO:
+					//							// find
+					//							// interpolated
+					//							// values
+					//							// for
+					//							// all
+					//							// parameters
+					//							// at
+					//							// new
+					//							// anchor
+					//							ml.addMorphAnchor(maNew);
+					//						}
+					//
+					//					}
+					//					// if there are no anchors in the layer, can just add an
+					//					// anchor and set the appropriate MP
+					//					else { //
+					//						
+					//					}
 				}
 			}
 
