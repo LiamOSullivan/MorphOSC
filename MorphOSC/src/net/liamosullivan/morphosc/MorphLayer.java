@@ -3,9 +3,6 @@ package net.liamosullivan.morphosc;
 import java.util.ArrayList;
 import java.util.List;
 import processing.core.*;
-import processing.core.PFont;
-import processing.core.PShape;
-import processing.core.PVector;
 
 public class MorphLayer extends InteractiveLayer
 {
@@ -67,7 +64,7 @@ public class MorphLayer extends InteractiveLayer
 		//ma.setMorphParameterValueById(id_, val_);
 		this.maList.add(ma);
 		System.out.println("MorphAnchor "+ma.getId()+" added to layer "+ this.id);
-		
+
 	}
 
 	public void removeMorphAnchor()
@@ -111,43 +108,58 @@ public class MorphLayer extends InteractiveLayer
 		return ps;
 	}
 
-	float[] interpolate(PVector p_) {
+	protected float[] interpolate(PVector p_) {
 
 		PVector P = p_;
-		float[] iParams = new float[4];
-
-		float[] w = getInvDistances(P);
-
-		return iParams;
+		//float[] iParams = new float[mpList.size()];
+		float [] d = getInvDistances(P);
+		float[] was = getWeightedAves(d);
+		return was;
 	}
 
 	private float[] getInvDistances(PVector p_) {
 		PVector pv = p_;
+		pv.x=pv.x-lx; //correct for position of layer
+		pv.y=pv.y-ly;
 		float[] dists = new float[maList.size()];
+		System.out.print("Distance Values :");
 		for (int i = 0; i < maList.size(); i++) {
 			MorphAnchor ma = (MorphAnchor)this.maList.get(i);
 			dists[i] = PVector.dist(pv, ma.p);
+			System.out.print("\t " +parent.nf(dists[i], 2, 2));
 		}
-
+		System.out.println();
+		float mx = parent.max(dists);
+		System.out.println("max: "+mx);
+		System.out.print("Inverse Distance Values :");
+		for (int i=0; i<maList.size(); i+=1) {
+			dists[i] = dists[i]/mx;      //normalise
+			dists[i] = 1.0F/dists[i];     //invert
+			System.out.print("\t " +parent.nf(dists[i], 2, 2));
+		}
+		System.out.println();
 		return dists;
 	}
 
-	float[] getWeightedAves(float[] wts_, float[][] prms_) {
-		float[] wts = wts_;
-		float[][] prms = prms_;
-		float[] W = new float[prms[0].length];
+	float[] getWeightedAves(float[] d_) {
+		float[] d = d_; //the normalised distances from the interpolation point to each anchor
+		float[] wOut = new float[maList.get(0).getMPList().size()]; //weighted output for each parameter added to anchors
 		float wSum = 0.0F;
-
-		for (int i = 0; i < wts.length; i++) {
-			wSum += wts[i];
-			for (int j = 0; j < prms[i].length; j++) {
-				W[j] += wts[i] * prms[i][j];
+		//Multiply MP value by weights
+		System.out.print("Weighting: ");
+		for (int i = 0; i < d.length; i++) {
+			wSum += d[i];
+			for (int j = 0; j < maList.get(0).getMPList().size(); j++) {
+				MorphParameter mp = (MorphParameter) maList.get(i).getMPList().get(j);
+				System.out.println("Anchor #"+i+" MP #"+mp.getId()+" has value "+mp.getValue());
+				wOut[j] += d[i] * mp.getValue();
 			}
 		}
-		for (int i = 0; i < W.length; i++) {
-			W[i] /= wSum;
+		for (int i = 0; i < wOut.length; i++) {
+			wOut[i] /= wSum;
 		}
-		return W;
+		System.out.println();
+		return wOut;
 	}
 
 	@Override
@@ -185,7 +197,7 @@ public class MorphLayer extends InteractiveLayer
 			//parent.text(""+ma.getPosition().x + ma.getPosition().y, ma.getPosition().x, ma.getPosition().y); 
 			for(int j=0;j<ma.valueList.size();j+=1){ //TODO: change to method getValueList
 				parent.stroke(255,255,255,200);
-//				parent.text("*", ma.getPosition().x, ma.getPosition().y+(i*anchorTextSize)); 
+				//				parent.text("*", ma.getPosition().x, ma.getPosition().y+(i*anchorTextSize)); 
 				parent.text(ma.getMPValueByIndex(j), ma.getPosition().x, ma.getPosition().y+(j*anchorTextSize)); 
 				//TODO: get rid of valueList and just use MPs, as there is an mpList for each anchor 
 				//that can hold 'current' value

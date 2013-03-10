@@ -44,6 +44,16 @@ public class Zone {
 		this.pos=pos_;
 
 	}
+	
+	void setId(int id_){
+
+		id=id_;
+	}
+
+	int getId(){
+		return id;
+
+	}
 
 	void setPosition(PVector p_){
 

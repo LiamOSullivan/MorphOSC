@@ -33,6 +33,7 @@ public class MorphOSC implements PConstants {
 	// Display assets
 	PImage locked, unlocked;
 	private float lockX, lockY; // position of the GUI lock/unlock button
+	int lockImageScale = 4;
 
 	int nSafeZones = 0;
 
@@ -84,18 +85,28 @@ public class MorphOSC implements PConstants {
 	}
 
 	private void initGUI() {
-		locked = parent.loadImage("data/lock_lock_01.png");
-		unlocked = parent.loadImage("data/lock_unlock_01.png");
+		
+		try {
+			locked = parent.loadImage("data/lock_lock_01_small.jpg");
+			unlocked = parent.loadImage("data/lock_unlock_01_small.jpg");
+		} catch (Exception e) {
+			// TODO Implement catch block
+			e.printStackTrace();
+			System.out.println("Could not load images!");
+			
+		}
 		if (guiIsLocked) {
-			lockX = parent.width - (locked.width / 2);
-			lockY = locked.height / 2;
+			lockX = 50;
+			lockY = parent.height-locked.height;
 		} else {
-			lockX = parent.width - (unlocked.width / 2);
-			lockY = unlocked.height / 2;
+			lockX = 50;
+			lockY = parent.height-unlocked.height;
 		}
 		// SafeZones for GUI elements
-		sZoneList.add(new SafeZone(parent, nSafeZones, lockX, lockY,
-				(float) locked.width / 2, (float) locked.height / 2)); //GUI lock
+		SafeZone lock = new SafeZone(parent, nSafeZones, lockX, lockY,
+				(float) locked.width, (float) locked.height); //GUI lock
+		lock.setId(nSafeZones);
+		sZoneList.add(lock); 
 		nSafeZones += 1;
 
 	}
@@ -109,6 +120,7 @@ public class MorphOSC implements PConstants {
 	public void setLockPosition(int lkx_, int lky_) {
 		lockX = lkx_;
 		lockY = lky_;
+		
 	}
 
 	private int[] generateParamColors(int max_) {
@@ -168,8 +180,11 @@ public class MorphOSC implements PConstants {
 			mp.setId(nMParams);
 			mpList.add(mp);
 			nMParams += 1;
-			sZoneList.add(new SafeZone(parent, nSafeZones, mp.getPosition(), 
-					mp.getSize()));
+			SafeZone sz = new SafeZone(parent, nSafeZones, c.getPosition().x, 
+					c.getPosition().y-c.getHeight()/4,(float) c.getWidth(), (float) c.getHeight()); //GUI lock
+			sz.setId(nSafeZones);
+			sZoneList.add(sz); 
+			System.out.println("Safe Zone #"+sz.getId()+" added to controller #"+c.getId());
 			nSafeZones += 1;
 		} else {
 			System.out.println("Can't add Controller, maximum reached");
@@ -255,7 +270,6 @@ public class MorphOSC implements PConstants {
 	}
 
 
-
 	public void getControllerInfo() {
 		for (int i = 0; i < cList.size(); i++) {
 			Controller c = (Controller) cList.get(i);
@@ -297,7 +311,6 @@ public class MorphOSC implements PConstants {
 
 		for (int i = 0; i < mlList.size(); i += 1) {
 			MorphLayer ml = mlList.get(i);
-
 			//System.out.println("Layer position: " + ml.getPosition());
 			parent.pushMatrix();
 			parent.translate(ml.getPosition().x, ml.getPosition().y);
@@ -306,11 +319,11 @@ public class MorphOSC implements PConstants {
 		}
 
 		if (guiIsLocked) {
-			parent.image(locked, lockX, lockY, locked.width / 4,
-					locked.width / 4);
+			parent.image(locked, lockX, lockY, locked.width,
+					locked.width);
 		} else {
-			parent.image(unlocked, lockX, lockY, unlocked.width / 4,
-					unlocked.width / 4);
+			parent.image(unlocked, lockX, lockY, unlocked.width,
+					unlocked.width);
 		}
 
 		parent.stroke(255, 200);
@@ -380,10 +393,29 @@ public class MorphOSC implements PConstants {
 		if (guiIsLocked) { // Gestures cause interpolated output when GUI is
 			// locked
 			boolean keepChecking = true;
+			for (int i = 0; i < nSafeZones && keepChecking; i += 1) { 
+				SafeZone sz = sZoneList.get(i);
+				if (sz.select(v)) {
+					System.out.println("Safe Zone " + sz.getId() + " selected");
+					if(sz.getId()==0){ //safe 0 is GUI lock toggle
+						guiIsLocked=!guiIsLocked;
+					}
+					keepChecking = false;
+
+				}
+			}
+			
 			for (int i = nMLayers - 1; i >= 0 && keepChecking; i--) {
-				MorphLayer tl = mlList.get(i);
-				if (tl.select(v)) {
+				MorphLayer ml = mlList.get(i);
+				if (ml.select(v)) {
 					System.out.println("Layer " + i + " selected");
+					float [] interps = ml.interpolate(v);
+					System.out.print("Interp Values :");
+					for(int j=0;j<interps.length;j+=1){
+						System.out.print("\t " +parent.nf(interps[j], 2, 2));	
+					
+					}
+					System.out.println();
 					keepChecking = false;
 
 				}
@@ -391,19 +423,19 @@ public class MorphOSC implements PConstants {
 			if (keepChecking) {
 				// System.out.println(" Free space ");
 			}
+			
 		} else if (!guiIsLocked) {
 			boolean keepChecking = true;
 			// Check if over a SafeZone (GUI elements which exist in MorphOSC
 			// object)
-			for (int i = 0; i < nSafeZones && keepChecking; i += 1) { // check
-				// from
-				// top
-				// drawn
-				// layer
-				// downwards
+			for (int i = 0; i < nSafeZones && keepChecking; i += 1) { 
 				SafeZone sz = sZoneList.get(i);
 				if (sz.select(v)) {
-					System.out.println("Safe Zone " + i + " selected");
+					System.out.println("Safe Zone " + sz.getId() + " selected");
+					if(sz.getId()==0){ //safe 0 is GUI lock toggle
+						guiIsLocked=!guiIsLocked;
+						
+					}
 					keepChecking = false;
 
 				}
