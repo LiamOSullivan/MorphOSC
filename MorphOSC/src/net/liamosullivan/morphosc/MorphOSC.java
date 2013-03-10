@@ -12,6 +12,11 @@ import processing.core.PVector;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
 
+/*TODO:
+ * Add ability to drag multiple parameters to a layer at once e.g. using multi-select.
+
+
+*/
 public class MorphOSC implements PConstants {
 	PApplet parent;
 	// Defaults
@@ -549,95 +554,59 @@ public class MorphOSC implements PConstants {
 					else if (!mpl.contains(mpVDrag) && mpl.size()>0 && mal.size()>0){
 						ml.addMorphParameter(mpVDrag); 
 						MorphAnchor maNew = new MorphAnchor(mal.size(), v);
+						//Add all MPs to new MA
 						for(int j=0;j<mpl.size();j+=1){
 							MorphParameter mpExists = (MorphParameter)mpl.get(j);  //TODO: get rid of cast
 							maNew.addMorphParameter(mpExists);
 							maNew.setMorphParameterValueById(mpExists.getId(),mpExists.getValue()); //TODO: determine how to set values of MPs with existing MAs
 							System.out.println("Existing MP #"+mpExists.getId()+" has value "+mpExists.getValue());
-						}						
+						}
+						//update all anchors with all other params
 						for(int j=0;j<mal.size();j+=1){
 							MorphAnchor a = (MorphAnchor)mal.get(j);
 							ArrayList ampl = (ArrayList) a.getMPList();
 							if(!ampl.contains(mpVDrag)){   //TODO: does contains work okay here? What about values?
 								a.addMorphParameter(mpVDrag);
-								
-							}
-//							for(int k=0;k<ampl.size();i+=1){
-//								MorphParameter amp = (MorphParameter) ampl.get(k);
-//								if(amp.getId()!= mpVDrag.getId()){
-////
-//								}
-//							}
 
+							}
 						}
 
 						ml.addMorphAnchor(maNew); //adds MA to maList
 
-
 					}
-					//					//if MP already in layer, but no anchors present, need to  
-					//					//Add an anchor and add the MP and value to it...
-					//					else if (mpl.contains(mpVDrag) && mal.size()==0){
-					//						
-					//						MorphAnchor maNew = new MorphAnchor(mal.size()-1, v);
-					//						maNew.addMorphParameter(mpVDrag);
-					//						maNew.setMorphParameterValueById(mpVDrag.getId(), mpValue);
-					//						ml.addMorphAnchor(maNew); //adds MA to maList
-					//												
-					//					}
-					//					//if new MP in layer, just add a new anchor
-					//					else if (mpl.contains(mpVDrag) && mal.size()>0){
-					//						MorphAnchor maNew = new MorphAnchor(mal.size()-1, v);
-					//						maNew.addMorphParameter(mpVDrag);
-					//						maNew.setMorphParameterValueById(mpVDrag.getId(), mpValue);
-					//						ml.addMorphAnchor(maNew); //adds MA to maList
-					//									
-					//					}
-					//					
-
-
-					//					// second, now the MP is added to the layer, so add the
-					//					// value to an anchor
-					//					// check if there are anchors in the layer
-					//					if (ml.getMAList().size() > 0) {
-					//						// check if over an existing anchor
-					//						//System.out.println("maList has elements");
-					//						List<MorphAnchor> maL = ml.getMAList();
-					//						for (int j = 0; i < maL.size() && keepChecking; i += 1) {
-					//							MorphAnchor ma = maL.get(i);
-					//							if (ma.select(v)) {
-					//								// if over an anchor, set the value of the
-					//								// appropriate MP
-					//								ma.setMorphParameterValueById(mpVDrag.getId(),
-					//										mpValue);
-					//								keepChecking = false;
-					//							}
-					//						}
-					//						// if not over an anchor AND there are other anchors,
-					//						// need to create a new anchor
-					//						// As anchor must contain all MPs for Layer, need to
-					//						// find values for other MPs at the
-					//						// new anchor point
-					//						if (keepChecking) {
-					//							MorphAnchor maNew = new MorphAnchor(ml.getNMAs(), v); // TODO:
-					//							// find
-					//							// interpolated
-					//							// values
-					//							// for
-					//							// all
-					//							// parameters
-					//							// at
-					//							// new
-					//							// anchor
-					//							ml.addMorphAnchor(maNew);
-					//						}
+					//4. MP in layer, so MPList size >0, but NO anchors
 					//
-					//					}
-					//					// if there are no anchors in the layer, can just add an
-					//					// anchor and set the appropriate MP
-					//					else { //
-					//						
-					//					}
+					else if (mpl.contains(mpVDrag) && mal.size()==0){
+						MorphAnchor maNew = new MorphAnchor(mal.size()-1, v);
+						for(int j=0;j<mpl.size();j+=1){
+							MorphParameter mpExists = (MorphParameter)mpl.get(j);  //TODO: get rid of cast
+							maNew.addMorphParameter(mpExists);
+							maNew.setMorphParameterValueById(mpExists.getId(),mpExists.getValue()); //TODO: determine how to set values of MPs with existing MAs
+							//System.out.println("Existing MP #"+mpExists.getId()+" has value "+mpExists.getValue());
+						}
+						ml.addMorphAnchor(maNew); //adds MA to maList
+					}
+					//5. MP in layer, there ARE anchors
+					else if (mpl.contains(mpVDrag) && mal.size()>0){
+						MorphAnchor maNew = new MorphAnchor(mal.size()-1, v);
+						for(int j=0;j<mpl.size();j+=1){
+							MorphParameter mpExists = (MorphParameter)mpl.get(j);  //TODO: get rid of cast
+							maNew.addMorphParameter(mpExists);
+							maNew.setMorphParameterValueById(mpExists.getId(),mpExists.getValue()); //TODO: determine how to set values of MPs with existing MAs
+							//System.out.println("Existing MP #"+mpExists.getId()+" has value "+mpExists.getValue());
+						}
+						ml.addMorphAnchor(maNew); //adds MA to maList
+						//update all anchors with all other params
+						for(int j=0;j<mal.size();j+=1){
+							MorphAnchor a = (MorphAnchor)mal.get(j);
+							ArrayList ampl = (ArrayList) a.getMPList();
+							if(!ampl.contains(mpVDrag)){   //TODO: does contains work okay here? What about values?
+								a.addMorphParameter(mpVDrag);
+
+							}
+						}
+					}
+
 				}
 			}
 
