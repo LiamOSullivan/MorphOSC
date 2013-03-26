@@ -285,7 +285,7 @@ public class MorphOSC implements PConstants {
 		}
 	}
 
-	private int findMPIndexById(int fid_){
+	private int getMPIndexById(int fid_){
 		int fid = fid_;
 		int index;
 		MorphParameter mp;
@@ -297,6 +297,38 @@ public class MorphOSC implements PConstants {
 		}
 		return -1;
 	}
+
+	private int getMLayerIndexById(int layerId_){
+		int layerId=layerId_;
+		for(int i=0; i<mlList.size();i+=1){
+			if(mlList.get(i).getId()==layerId_){
+				return i;
+			}
+			
+		}
+		return -1;
+		 
+	
+	}
+	
+	private MorphAnchor getMAFromLayerById(int layerId_, int anchorId_){
+		int layerId = layerId_;
+		int anchorId = anchorId_;
+		MorphLayer l = mlList.get(layerId);
+		ArrayList<MorphAnchor> al = l.getMAList();
+		MorphAnchor ma;
+		int index = -1;
+		for(int i=0;i<al.size();i+=1){
+			ma=al.get(i);
+			if(ma.getId()==anchorId){
+			return ma;	
+			}
+			
+		}
+		return new MorphAnchor(-1,new PVector(-1,-1)); //Null MorphAnchor
+
+	}
+
 
 	public void pre() {
 		parent.background(0);
@@ -589,7 +621,7 @@ public class MorphOSC implements PConstants {
 						maNew.setMorphParameterValueById(mpVDrag.getId(), mpValue);
 						System.out.println("MorphAnchor #"+maNew.getId()+" to be added to Layer #"+ i);
 						ml.addMorphAnchor(maNew); //adds MA to maList
-						
+
 
 					}
 
@@ -698,8 +730,7 @@ public class MorphOSC implements PConstants {
 			MorphLayer tl = mlList.get(i);
 			tl.isDraggingOnLayer = false;
 		}
-		// isPNodeMoving=false;
-		// destroyInterpNode();
+
 	}
 
 	private void mouseClicked(PVector v_) {
@@ -711,16 +742,10 @@ public class MorphOSC implements PConstants {
 		PVector v = v_;
 		setMouseVector(v);
 		if (guiIsLocked) {
-			for (int i = nMLayers - 1; i >= 0; i--) { // check from front layer
-				// backwards
+			for (int i = nMLayers - 1; i >= 0; i--) { // check from frontmost layer backwards
 				MorphLayer tl = mlList.get(i);
 				if (tl.select(v)) {
-					// println("Left Dragging on Layer "+i);
 					tl.isDraggingOnLayer = true;
-					// tl.getCursor(); //returns the position of the cursor
-					// relative to the current layer
-					// tl.interpolate(v);
-					// tl.getInvDistances();
 				} else {
 					tl.isDraggingOnLayer = false;
 				}
@@ -728,15 +753,19 @@ public class MorphOSC implements PConstants {
 		} else if (!guiIsLocked) {
 			if (layerIsMoving) {
 				MorphLayer tlMove = mlList.get(movingLayer);
-				// tlMove.getCursor();
-				// pushMatrix();
 				tlMove.move(v);
-				// popMatrix();
+
 			}
 			if (layerIsResizing) {
 				MorphLayer tlResize = mlList.get(resizeLayer);
 				tlResize.resize(v);
 			}
+			if (isDraggingMAnchor) {
+				MorphAnchor ma = getMAFromLayerById(dragMAnchorID[0], dragMAnchorID[1]);
+				ma.move(PVector.sub(v, mlList.get(getMLayerIndexById(dragMAnchorID[0])).getPosition()));
+				System.out.println("Dragging MorphAnchor");
+			}
+
 
 		}
 
@@ -746,11 +775,7 @@ public class MorphOSC implements PConstants {
 		PVector v = v_;
 		setMouseVector(v);
 		boolean keepChecking = true;
-		for (int i = nMLayers - 1; i >= 0 && keepChecking; i--) { // check from
-			// frontmost
-			// drawn
-			// layer
-			// backwards
+		for (int i = nMLayers - 1; i >= 0 && keepChecking; i--) { 
 			MorphLayer tl = mlList.get(i);
 			if (tl.selectHandle(v)) {
 				//				System.out.println("Over handle " + tl.handleId
@@ -802,7 +827,7 @@ public class MorphOSC implements PConstants {
 		//		System.out.println("Controller no. is "
 		//				+ e.getController().getId());
 
-		int index = findMPIndexById(e.getController().getId());
+		int index = getMPIndexById(e.getController().getId());
 		//		System.out.println("...index is "+index);
 		if(e.isController()	&& index >= 0){
 			mpList.get(index).setVZValue(e.getController().getValue());
@@ -812,7 +837,7 @@ public class MorphOSC implements PConstants {
 	protected void updateController(ControlEvent e) {
 
 
-		int index = findMPIndexById(e.getController().getId());
+		int index = getMPIndexById(e.getController().getId());
 		if(index!=-1){
 
 

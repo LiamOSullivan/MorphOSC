@@ -61,6 +61,10 @@ implements PConstants
 		createHandles();
 		font = parent.createFont("Consolas-48.vlw", 32.0F);
 	}
+	
+	int getId(){
+		return this.id;
+	}
 
 	void createHandles() {
 		handleX = new float[noOfHandles];
