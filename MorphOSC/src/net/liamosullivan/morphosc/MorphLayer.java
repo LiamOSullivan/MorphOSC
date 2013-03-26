@@ -109,12 +109,13 @@ public class MorphLayer extends InteractiveLayer
 	}
 
 	protected float[] interpolate(PVector p_) {
-
 		PVector P = p_;
 		//float[] iParams = new float[mpList.size()];
 		float [] d = getInvDistances(P);
 		float[] was = getWeightedAves(d);
 		return was;
+		
+		
 	}
 
 	private float[] getInvDistances(PVector p_) {
@@ -197,7 +198,7 @@ public class MorphLayer extends InteractiveLayer
 			//parent.text(""+ma.getPosition().x + ma.getPosition().y, ma.getPosition().x, ma.getPosition().y); 
 			for(int j=0;j<ma.valueList.size();j+=1){ //TODO: change to method getValueList
 				parent.stroke(255,255,255,200);
-				//				parent.text("*", ma.getPosition().x, ma.getPosition().y+(i*anchorTextSize)); 
+				//parent.text("*", ma.getPosition().x, ma.getPosition().y+(i*anchorTextSize)); 
 				parent.text(ma.getMPValueByIndex(j), ma.getPosition().x, ma.getPosition().y+(j*anchorTextSize)); 
 				//TODO: get rid of valueList and just use MPs, as there is an mpList for each anchor 
 				//that can hold 'current' value

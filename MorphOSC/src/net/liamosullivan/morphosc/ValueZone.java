@@ -25,7 +25,7 @@ public class ValueZone extends Zone {
 
 	void setValue(float v_){
 		this.value = v_;	
-		System.out.println("Value Zone updated");
+		//System.out.println("Value Zone updated");
 
 	}
 

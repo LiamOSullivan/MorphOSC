@@ -14,7 +14,7 @@ public class MorphAnchor
 	PVector offset; //for moving
 	float xOffset;
 	float yOffset;
-	float s = 20.0F; //arbitrary size (for boundary checking)
+	float s = 50.0F; //arbitrary size (for boundary checking)
 
 	MorphAnchor(int id_, PVector p_)
 	{
@@ -106,6 +106,7 @@ public class MorphAnchor
 			}
 		}
 		valueList.set(index, val);
+		System.out.println("Set MA #"+this.id+" MP #"+mpList.get(index).getId()+" with value "+val);
 	}
 
 	public void setMorphParameterValue(String name_){
@@ -116,12 +117,10 @@ public class MorphAnchor
 	boolean select(PVector pv_) {
 
 		PVector pv=pv_;
-		//		if ((pv.x > p.x ) && (pv.x < x + width) && 
-		//				(pv.y > p.y ) && (pv.y < y + height))
 		float disX = p.x- pv.x;
 		float disY = p.y- pv.y;
-		if (Math.sqrt(disX*disX + disY*disY) < s/2) { //check circular area
-
+		if (Math.sqrt(disX*disX + disY*disY) < s) { //check circular area
+			System.out.println("***MA selected");
 			return true;
 		}
 

@@ -97,7 +97,7 @@ implements PConstants
 			float disY = ly + handleY[i] - v.y;
 			if (PApplet.sqrt(PApplet.sq(disX) + PApplet.sq(disY)) < handleSize / 2.0F) {
 				handleId = i;
-				PApplet.println("HandleId " + handleId);
+				//PApplet.println("HandleId " + handleId);
 				selected = true;
 			}
 			else

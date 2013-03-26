@@ -16,7 +16,7 @@ import processing.event.MouseEvent;
  * Add ability to drag multiple parameters to a layer at once e.g. using multi-select.
 
 
-*/
+ */
 public class MorphOSC implements PConstants {
 	PApplet parent;
 	// Defaults
@@ -85,7 +85,7 @@ public class MorphOSC implements PConstants {
 	}
 
 	private void initGUI() {
-		
+
 		try {
 			locked = parent.loadImage("data/lock_lock_01_small.jpg");
 			unlocked = parent.loadImage("data/lock_unlock_01_small.jpg");
@@ -93,7 +93,7 @@ public class MorphOSC implements PConstants {
 			// TODO Implement catch block
 			e.printStackTrace();
 			System.out.println("Could not load images!");
-			
+
 		}
 		if (guiIsLocked) {
 			lockX = 50;
@@ -120,7 +120,7 @@ public class MorphOSC implements PConstants {
 	public void setLockPosition(int lkx_, int lky_) {
 		lockX = lkx_;
 		lockY = lky_;
-		
+
 	}
 
 	private int[] generateParamColors(int max_) {
@@ -184,7 +184,7 @@ public class MorphOSC implements PConstants {
 					c.getPosition().y-c.getHeight()/4,(float) c.getWidth(), (float) c.getHeight()); //GUI lock
 			sz.setId(nSafeZones);
 			sZoneList.add(sz); 
-			System.out.println("Safe Zone #"+sz.getId()+" added to controller #"+c.getId());
+			//System.out.println("Safe Zone #"+sz.getId()+" added to controller #"+c.getId());
 			nSafeZones += 1;
 		} else {
 			System.out.println("Can't add Controller, maximum reached");
@@ -277,9 +277,9 @@ public class MorphOSC implements PConstants {
 			String name = c.getName();
 			String add = c.getAddress();
 			String val = Float.toString(c.getValue());
-			System.out.print("Controller " + i + "\t Label: " + label
-					+ "\t Name: " + name);
-			System.out.println("\t Address: " + add + "\t Value: " + val);
+//			System.out.print("Controller " + i + "\t Label: " + label
+//					+ "\t Name: " + name);
+//			System.out.println("\t Address: " + add + "\t Value: " + val);
 		}
 	}
 
@@ -299,10 +299,10 @@ public class MorphOSC implements PConstants {
 	public void pre() {
 		parent.background(0);
 		showMParameters();
+		
 	}
 
 	public void draw() {
-
 		displayGUI();
 		// System.out.println("Draw called");
 	}
@@ -396,7 +396,7 @@ public class MorphOSC implements PConstants {
 			for (int i = 0; i < nSafeZones && keepChecking; i += 1) { 
 				SafeZone sz = sZoneList.get(i);
 				if (sz.select(v)) {
-					System.out.println("Safe Zone " + sz.getId() + " selected");
+//					System.out.println("Safe Zone " + sz.getId() + " selected");
 					if(sz.getId()==0){ //safe 0 is GUI lock toggle
 						guiIsLocked=!guiIsLocked;
 					}
@@ -404,26 +404,27 @@ public class MorphOSC implements PConstants {
 
 				}
 			}
-			
+
 			for (int i = nMLayers - 1; i >= 0 && keepChecking; i--) {
 				MorphLayer ml = mlList.get(i);
 				if (ml.select(v)) {
-					System.out.println("Layer " + i + " selected");
-					float [] interps = ml.interpolate(v);
-					System.out.print("Interp Values :");
-					for(int j=0;j<interps.length;j+=1){
-						System.out.print("\t " +parent.nf(interps[j], 2, 2));	
-					
-					}
-					System.out.println();
-					keepChecking = false;
+//					System.out.println("Layer " + i + " selected");
+					if(ml.getNMAs()>1){ //only try to interpolate if 2 or more anchors present in layer.
+						float [] interps = ml.interpolate(v);
+						System.out.print("Interp Values :");
+						for(int j=0;j<interps.length;j+=1){
+							System.out.print("\t " +parent.nf(interps[j], 2, 2));	
 
+						}
+						System.out.println();
+					}
+					keepChecking = false; //place inside above condition?
 				}
 			}
 			if (keepChecking) {
 				// System.out.println(" Free space ");
 			}
-			
+
 		} else if (!guiIsLocked) {
 			boolean keepChecking = true;
 			// Check if over a SafeZone (GUI elements which exist in MorphOSC
@@ -431,10 +432,10 @@ public class MorphOSC implements PConstants {
 			for (int i = 0; i < nSafeZones && keepChecking; i += 1) { 
 				SafeZone sz = sZoneList.get(i);
 				if (sz.select(v)) {
-					System.out.println("Safe Zone " + sz.getId() + " selected");
+//					System.out.println("Safe Zone " + sz.getId() + " selected");
 					if(sz.getId()==0){ //safe 0 is GUI lock toggle
 						guiIsLocked=!guiIsLocked;
-						
+
 					}
 					keepChecking = false;
 
@@ -446,8 +447,8 @@ public class MorphOSC implements PConstants {
 				MorphParameter mp = mpList.get(i);
 				SelectZone slz = mp.getSelectZone();
 				if (slz.select(v)) {
-					System.out.println(" MorphParameter " + mp.getId()
-							+ " selected");
+//					System.out.println(" MorphParameter " + mp.getId()
+//							+ " selected");
 					isDraggingMParameter = true;
 					draggingMParam = i;
 					keepChecking = false;
@@ -460,8 +461,8 @@ public class MorphOSC implements PConstants {
 				MorphParameter mp = mpList.get(i);
 				ValueZone vlz = mp.getValueZone();
 				if (vlz.select(v)) {
-					System.out.println(" MorphParameter value id" + mp.getId()
-							+ " selected");
+//					System.out.println(" MorphParameter value id" + mp.getId()
+//							+ " selected");
 					isDraggingMPValue = true;
 					draggingMPValue = i;
 					mpValue = cList.get(i).getValue(); // get the value from the
@@ -472,15 +473,10 @@ public class MorphOSC implements PConstants {
 				}
 			}
 			//
-			for (int i = nMLayers - 1; i >= 0 && keepChecking; i--) { // check
-				// from
-				// top
-				// drawn
-				// layer
-				// downwards
+			for (int i = nMLayers - 1; i >= 0 && keepChecking; i--) { 
 				MorphLayer tl = mlList.get(i);
 				if (tl.selectHandle(v)) {
-					System.out.println(" Layer " + i + " Handle selected");
+//					System.out.println(" Layer " + i + " Handle selected");
 					keepChecking = false;
 					resizeLayer = i;
 					isResizing = true;
@@ -489,7 +485,7 @@ public class MorphOSC implements PConstants {
 			for (int i = nMLayers - 1; i >= 0 && keepChecking; i--) {
 				MorphLayer tl = mlList.get(i);
 				if (tl.selectBar(v)) {
-					System.out.println(" Layer " + i + " bar selected");
+//					System.out.println(" Layer " + i + " bar selected");
 					keepChecking = false;
 					movingLayer = i;
 					isMoving = true;
@@ -499,11 +495,8 @@ public class MorphOSC implements PConstants {
 			for (int i = nMLayers - 1; i >= 0 && keepChecking; i--) {
 				MorphLayer tl = mlList.get(i);
 				if (tl.select(v)) {
-					System.out.println(" Layer " + i + " selected");
+//					System.out.println(" Layer " + i + " selected");
 					keepChecking = false;
-					// tl.addParameterNode(int(tl.xRelative),
-					// int(tl.yRelative)); //.select calls getCursor(), which
-					// sets relatives
 				}
 			}
 			if (keepChecking) {
@@ -511,7 +504,7 @@ public class MorphOSC implements PConstants {
 					// Hack to ignore click over open settings menu
 					// TO DO: Add ability to drag-and-drop parameters from here
 				} else {
-					System.out.println(" Left-Click in free space ");
+//					System.out.println(" Left-Click in free space ");
 					addMorphLayer(v);
 				}
 			} else {
@@ -591,7 +584,7 @@ public class MorphOSC implements PConstants {
 							MorphParameter mpExists = (MorphParameter)mpl.get(j);  //TODO: get rid of cast
 							maNew.addMorphParameter(mpExists);
 							maNew.setMorphParameterValueById(mpExists.getId(),mpExists.getValue()); //TODO: determine how to set values of MPs with existing MAs
-							System.out.println("Existing MP #"+mpExists.getId()+" has value "+mpExists.getValue());
+//							System.out.println("Existing MP #"+mpExists.getId()+" has value "+mpExists.getValue());
 						}
 						//update all anchors with all other params
 						for(int j=0;j<mal.size();j+=1){
@@ -619,16 +612,28 @@ public class MorphOSC implements PConstants {
 						ml.addMorphAnchor(maNew); //adds MA to maList
 					}
 					//5. MP in layer, there ARE anchors
+					//TODO: Add ability to drop values on existing anchors here
 					else if (mpl.contains(mpVDrag) && mal.size()>0){
-						MorphAnchor maNew = new MorphAnchor(mal.size()-1, v);
-						for(int j=0;j<mpl.size();j+=1){
-							MorphParameter mpExists = (MorphParameter)mpl.get(j);  //TODO: get rid of cast
-							maNew.addMorphParameter(mpExists);
-							maNew.setMorphParameterValueById(mpExists.getId(),mpExists.getValue()); //TODO: determine how to set values of MPs with existing MAs
-							//System.out.println("Existing MP #"+mpExists.getId()+" has value "+mpExists.getValue());
+						//check if over an anchor, if so set the MP value, if not create anchor
+						boolean foundAnchor =false;
+						for(i=0; i<ml.maList.size();i+=1 ){
+							if(ml.maList.get(i).select(PVector.sub(v, ml.getPosition()))){
+								ml.maList.get(i).setMorphParameterValueById(mpVDrag.getId(), mpValue);
+								System.out.println("Over existing anchor!");
+								foundAnchor =true;
+							}
 						}
-						ml.addMorphAnchor(maNew); //adds MA to maList
-						//update all anchors with all other params
+						if(!foundAnchor){
+							MorphAnchor maNew = new MorphAnchor(mal.size()-1, v);
+							for(int j=0;j<mpl.size();j+=1){
+								MorphParameter mpExists = (MorphParameter)mpl.get(j);  //TODO: get rid of cast
+								maNew.addMorphParameter(mpExists);
+								maNew.setMorphParameterValueById(mpExists.getId(),mpExists.getValue()); //TODO: determine how to set values of MPs with existing MAs
+								//System.out.println("Existing MP #"+mpExists.getId()+" has value "+mpExists.getValue());
+							}
+							ml.addMorphAnchor(maNew); //adds MA to maList
+							//update all anchors with all other params
+						}
 						for(int j=0;j<mal.size();j+=1){
 							MorphAnchor a = (MorphAnchor)mal.get(j);
 							ArrayList ampl = (ArrayList) a.getMPList();
@@ -712,8 +717,8 @@ public class MorphOSC implements PConstants {
 			// backwards
 			MorphLayer tl = mlList.get(i);
 			if (tl.selectHandle(v)) {
-				System.out.println("Over handle " + tl.handleId
-						+ " for layer id " + tl.id);
+//				System.out.println("Over handle " + tl.handleId
+//						+ " for layer id " + tl.id);
 				tl.isOverHandle = true;
 				tl.isOverLayer = true;
 				keepChecking = false;
@@ -755,14 +760,14 @@ public class MorphOSC implements PConstants {
 	}
 
 	public void controlEvent(ControlEvent e){
-
-		System.out.println("Control event in MorphOSC from "
-				+ e.getController().getName());
-		System.out.println("Controller no. is "
-				+ e.getController().getId());
+//
+//		System.out.println("Control event in MorphOSC from "
+//				+ e.getController().getName());
+//		System.out.println("Controller no. is "
+//				+ e.getController().getId());
 
 		int index = findMPIndexById(e.getController().getId());
-		System.out.println("...index is "+index);
+//		System.out.println("...index is "+index);
 		if(e.isController()	&& index >= 0){
 			mpList.get(index).setVZValue(e.getController().getValue());
 		}
