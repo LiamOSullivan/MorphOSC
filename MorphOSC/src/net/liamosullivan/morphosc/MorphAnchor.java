@@ -9,12 +9,12 @@ public class MorphAnchor
 {
 	List<MorphParameter> mpList = new ArrayList<MorphParameter>();
 	List<Float> valueList = new ArrayList<Float>();
-	int id;
+	private int id;
 	PVector p; //position
 	PVector offset; //for moving
 	float xOffset;
 	float yOffset;
-	float s = 50.0F; //arbitrary size (for boundary checking)
+	float s = 20.0F; //arbitrary size (for boundary checking)
 
 	MorphAnchor(int id_, PVector p_)
 	{
@@ -27,7 +27,7 @@ public class MorphAnchor
 		this.id = id_;
 	}
 
-	float getId() {
+	int getId() {
 		return this.id;
 	}
 

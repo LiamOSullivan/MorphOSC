@@ -7,9 +7,9 @@ import processing.core.*;
 public class MorphLayer extends InteractiveLayer
 {
 	PApplet parentApplet;
-	List<MorphParameter> mpList = new ArrayList();
+	private ArrayList<MorphParameter> mpList = new ArrayList();
 	private int nMPs = 0; //number of MPs currently in layer
-	List<MorphAnchor> maList = new ArrayList();
+	private ArrayList<MorphAnchor> maList = new ArrayList();
 	int nMAs = 0; //number of MAs currently in layer
 	List<Float> distances = new ArrayList();
 
@@ -21,6 +21,7 @@ public class MorphLayer extends InteractiveLayer
 	int mpSwatchSize;
 	int anchorTextSize = 20;
 	boolean movePoint = false;
+	boolean removeMPWithLastMA = true; //does what it says
 
 	MorphLayer(PApplet p_, int id_, int x_, int y_, int w_, int h_, int fC_, int sC_, int dispW_, int dispH_)
 	{
@@ -46,17 +47,17 @@ public class MorphLayer extends InteractiveLayer
 		int idRemove = idRemove_;
 	}
 
-	public List getMPList(){
+	protected ArrayList getMPList(){
 
 		return mpList;
 	}
 
-	public int getNMPs(){
+	protected int getNMPs(){
 
 		return nMAs;
 	}
 
-	public void addMorphAnchor(MorphAnchor ma_)
+	protected void addMorphAnchor(MorphAnchor ma_)
 	{
 		MorphAnchor ma = ma_;
 		PVector av = ma.getPosition();
@@ -67,8 +68,23 @@ public class MorphLayer extends InteractiveLayer
 
 	}
 
-	public void removeMorphAnchor()
-	{
+	protected void removeMorphAnchor(int idRemove_) {
+		//System.out.println("Remove MA call");
+		int idRemove = idRemove_;
+		for(int i=0; i<maList.size();i+=1){
+			if(maList.get(i).getId()==idRemove){
+				maList.remove(i);
+				System.out.println("Removing MA#"+idRemove+"from position #"+i+" in maList");
+				//if this is the last MA, remove the MP too
+				if(maList.size()==0&&removeMPWithLastMA){
+					//removeMorphParameter(); //TODO: handle MPs when last MA removed
+				}
+				break;
+			}
+
+		}
+
+
 	}
 
 	void moveMorphAnchor(int ix_, int iy_)
@@ -76,7 +92,7 @@ public class MorphLayer extends InteractiveLayer
 		int ix = ix_;
 		int iy = iy_;
 	}
-	List getMAList(){
+	protected ArrayList getMAList(){
 		return maList;	
 
 	}
@@ -114,8 +130,8 @@ public class MorphLayer extends InteractiveLayer
 		float [] d = getInvDistances(P);
 		float[] was = getWeightedAves(d);
 		return was;
-		
-		
+
+
 	}
 
 	private float[] getInvDistances(PVector p_) {
