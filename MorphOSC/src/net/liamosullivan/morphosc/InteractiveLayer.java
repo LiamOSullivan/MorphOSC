@@ -42,6 +42,10 @@ implements PConstants
 	boolean verboseDisplay = false; boolean displayContents = true;
 	boolean isOverHandle = false; boolean isOverLayer = false; boolean isOverLayerBar = false; boolean isDraggingOnLayer = false;
 
+	private final float MIN_WIDTH =50.0F;
+	private final float MIN_HEIGHT =50.0F;
+
+
 	InteractiveLayer(PApplet p_, int id_, int x_, int y_, int width_, int height_, int fC_, int sC_, int dispW_, int dispH_)
 	{
 		parent = p_;
@@ -61,7 +65,7 @@ implements PConstants
 		createHandles();
 		font = parent.createFont("Consolas-48.vlw", 32.0F);
 	}
-	
+
 	int getId(){
 		return this.id;
 	}
@@ -72,9 +76,9 @@ implements PConstants
 		halfWidth = (lWidth / 2);
 		halfHeight = (lHeight / 2);
 		handleX[0] = (- halfWidth);
-		handleY[0] = (- halfHeight);
+		handleY[0] = (- halfHeight - (barH));
 		handleX[1] = (halfWidth);
-		handleY[1] = (- halfHeight);
+		handleY[1] = (- halfHeight - (barH));
 		handleX[2] = (- halfWidth);
 		handleY[2] = (halfHeight);
 		handleX[3] = (halfWidth);
@@ -116,7 +120,7 @@ implements PConstants
 	{
 		PVector v=v_;
 		if ((v.x > lx - halfWidth) && (v.x < lx + halfWidth) && 
-				(v.y > ly - halfHeight) && (v.y < ly - halfHeight + barH))
+				(v.y > ly - halfHeight - barH) && (v.y < ly - halfHeight))
 		{
 			return true;
 		}
@@ -130,6 +134,8 @@ implements PConstants
 		// offset = dist(v, position);
 		xOffset = (v.x - lx);
 		yOffset = (v.y - ly);
+		System.out.println("X Offset: "+xOffset+"Y Offset: "+yOffset);
+			
 
 	}
 	public void setContentsStartPos(PVector mv_)
@@ -160,13 +166,27 @@ implements PConstants
 	void resize(PVector v_)
 	{
 		PVector v=v_;
-
-		lWidth = PApplet.abs(2 * (lx - v.x));
-		lHeight = PApplet.abs(2 * (ly - v.y));
+		//boolean hasScaled=false;
+		float originalW = lWidth;
+		float originalH = lHeight;
+		
+		lWidth = PApplet.constrain(PApplet.abs(2 * (lx - v.x)), MIN_WIDTH, parent.width);
+		
+		if(v.y-ly < 0){
+			lHeight = PApplet.constrain(PApplet.abs(2 * (ly - v.y - barH)), MIN_HEIGHT, parent.height);
+		}	
+		else{
+			lHeight = PApplet.constrain(PApplet.abs(2 * (ly - v.y)), MIN_HEIGHT, parent.height);	
+		}
 		halfWidth = ((float)(lWidth / 2.0D));
 		halfHeight = ((float)(lHeight / 2.0D));
 		createHandles();
-		resizeContents();
+		//if (hasScaled){
+		float xScale = lWidth/originalW;
+		float yScale = lHeight/originalH;
+		PVector scaler = new PVector (xScale, yScale);
+		resizeContents(scaler);
+		//}
 	}
 
 	void rotate()
@@ -226,7 +246,7 @@ implements PConstants
 		parent.rect(0, 0, lWidth, lHeight);    //draw main layer
 
 		parent.fill(fColour);
-		parent.rect(0, (float)(-halfHeight + 0.5D * barH), lWidth, barH); //draw top window bar
+		parent.rect(0, (float)(-halfHeight - 0.5D * barH), lWidth, barH); //draw top window bar
 		if (displayContents)
 			displayContents();
 	}
@@ -235,7 +255,7 @@ implements PConstants
 		//placeholder- implemented in subclass
 	}
 
-	void resizeContents(){
+	void resizeContents(PVector sc_){
 		//placeholder- implemented in subclass
 	}
 

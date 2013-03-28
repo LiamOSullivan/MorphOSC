@@ -180,11 +180,13 @@ public class MorphLayer extends InteractiveLayer
 	}
 
 	@Override
-	public void resizeContents()
+	public void resizeContents(PVector sf_)
 	{
+		PVector scaler = sf_;
+		System.out.println("scaleX "+scaler.x+"scaleY "+scaler.y);
 		for(int i =0;i<maList.size();i+=1){
 			MorphAnchor ma = maList.get(i);
-
+			ma.setPosition(new PVector (ma.getPosition().x*=scaler.x, ma.getPosition().y*=scaler.y));
 		}
 
 
