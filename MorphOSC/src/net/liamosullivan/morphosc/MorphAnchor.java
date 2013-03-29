@@ -60,8 +60,8 @@ public class MorphAnchor
 		MorphParameter mp=mp_;
 		mpList.add(mp);
 		valueList.add(mp.getValue());
-		System.out.print("Added MP to MorphAnchor's mpList, now has size "+mpList.size());
-		System.out.println("| Value added was "+valueList.get(valueList.size()-1));
+		//System.out.print("Added MP " +mp.getName()+" to MorphAnchor's mpList, now has size "+mpList.size());
+		//System.out.println("| Value added was "+valueList.get(valueList.size()-1));
 	}
 
 	public void removeMorphParameter()

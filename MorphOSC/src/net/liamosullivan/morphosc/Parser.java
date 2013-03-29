@@ -24,7 +24,7 @@ public class Parser
     Controller c = cin_;
     int color = color_;
     MorphParameter mp = 
-      new MorphParameter(this.parent, c.getId(), c.getName()); //getId() here may be returning -1
+      new MorphParameter(this.parent, c.getId(), c.getName()); 
     mp.setSize(new PVector(c.getWidth(), c.getHeight()));
     mp.setPosition(c.getPosition());
     mp.setColor(color);
@@ -33,10 +33,10 @@ public class Parser
     mp.setMax(c.getMax());
     mp.setMin(c.getMin());
     mp.setValue(c.getValue());
-    
-    
-    
-   
+    //mp.setName(c.getName());
+//    System.out.println("Parser: controller name: "+c.getName()
+//    		+" MP name: "+mp.getName());
+       
     return mp;
   }
 }

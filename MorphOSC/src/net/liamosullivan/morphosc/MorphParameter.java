@@ -71,7 +71,7 @@ public class MorphParameter
 
 	void setValue(float v_) {
 		this.value = v_;
-		setVZValue(value);
+		//setVZValue(value);
 	}
 
 	int getColor() {

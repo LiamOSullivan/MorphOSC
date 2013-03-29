@@ -97,8 +97,7 @@ public class MorphLayer extends InteractiveLayer
 
 	}
 	public int getNMAs(){
-
-		return nMAs;
+		return maList.size();
 	}
 
 	void displayInterp() {
@@ -124,12 +123,19 @@ public class MorphLayer extends InteractiveLayer
 		return ps;
 	}
 
-	protected float[] interpolate(PVector p_) {
+	protected MorphParameter[] interpolate(PVector p_) {
 		PVector P = p_;
 		//float[] iParams = new float[mpList.size()];
 		float [] d = getInvDistances(P);
 		float[] was = getWeightedAves(d);
-		return was;
+		MorphParameter [] interpMP = new MorphParameter[mpList.size()];
+		for(int i=0;i<mpList.size();i+=1){
+			interpMP[i] = new MorphParameter(parent, mpList.get(i).getId(),mpList.get(i).getName());
+//			interpMP[i].setId(mpList.get(i).getId());
+//			interpMP[i].setName(mpList.get(i).getName());
+			interpMP[i].setValue(was[i]);
+		}
+		return interpMP;
 
 
 	}
@@ -139,22 +145,22 @@ public class MorphLayer extends InteractiveLayer
 		pv.x=pv.x-lx; //correct for position of layer
 		pv.y=pv.y-ly;
 		float[] dists = new float[maList.size()];
-		System.out.print("Distance Values :");
+		//System.out.print("Distance Values :");
 		for (int i = 0; i < maList.size(); i++) {
 			MorphAnchor ma = (MorphAnchor)this.maList.get(i);
 			dists[i] = PVector.dist(pv, ma.p);
-			System.out.print("\t " +parent.nf(dists[i], 2, 2));
+			//System.out.print("\t " +parent.nf(dists[i], 2, 2));
 		}
 		System.out.println();
 		float mx = parent.max(dists);
-		System.out.println("max: "+mx);
-		System.out.print("Inverse Distance Values :");
+		//System.out.println("max: "+mx);
+		//System.out.print("Inverse Distance Values :");
 		for (int i=0; i<maList.size(); i+=1) {
 			dists[i] = dists[i]/mx;      //normalise
 			dists[i] = 1.0F/dists[i];     //invert
-			System.out.print("\t " +parent.nf(dists[i], 2, 2));
+			//System.out.print("\t " +parent.nf(dists[i], 2, 2));
 		}
-		System.out.println();
+		//System.out.println();
 		return dists;
 	}
 
@@ -163,19 +169,22 @@ public class MorphLayer extends InteractiveLayer
 		float[] wOut = new float[maList.get(0).getMPList().size()]; //weighted output for each parameter added to anchors
 		float wSum = 0.0F;
 		//Multiply MP value by weights
-		System.out.print("Weighting: ");
-		for (int i = 0; i < d.length; i++) {
+		//System.out.println("Weightings: ");
+		for(int i =0;i<maList.size();i+=1){
+			MorphAnchor ma = maList.get(i);
 			wSum += d[i];
-			for (int j = 0; j < maList.get(0).getMPList().size(); j++) {
-				MorphParameter mp = (MorphParameter) maList.get(i).getMPList().get(j);
-				System.out.println("Anchor #"+i+" MP #"+mp.getId()+" has value "+mp.getValue());
-				wOut[j] += d[i] * mp.getValue();
+			for (int j = 0; j < ma.valueList.size(); j++) {
+				float val = ma.getMPValueByIndex(j);
+				//MorphParameter mp = (MorphParameter) maList.get(i).getMPList().get(j);
+				//System.out.println("Anchor #"+i+" MP index"+j+" has value "+val);
+				wOut[j] += d[i] * val;
 			}
 		}
+					
 		for (int i = 0; i < wOut.length; i++) {
 			wOut[i] /= wSum;
 		}
-		System.out.println();
+		//System.out.println();
 		return wOut;
 	}
 

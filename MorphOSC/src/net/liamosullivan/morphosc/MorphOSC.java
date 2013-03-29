@@ -304,13 +304,13 @@ public class MorphOSC implements PConstants {
 			if(mlList.get(i).getId()==layerId_){
 				return i;
 			}
-			
+
 		}
 		return -1;
-		 
-	
+
+
 	}
-	
+
 	private MorphAnchor getMAFromLayerById(int layerId_, int anchorId_){
 		int layerId = layerId_;
 		int anchorId = anchorId_;
@@ -321,9 +321,9 @@ public class MorphOSC implements PConstants {
 		for(int i=0;i<al.size();i+=1){
 			ma=al.get(i);
 			if(ma.getId()==anchorId){
-			return ma;	
+				return ma;	
 			}
-			
+
 		}
 		return new MorphAnchor(-1,new PVector(-1,-1)); //Null MorphAnchor
 
@@ -438,22 +438,29 @@ public class MorphOSC implements PConstants {
 
 				}
 			}
-
+			//Press on layers when locked to produce interpolated values
+			//from anchors.
 			for (int i = nMLayers - 1; i >= 0 && keepChecking; i--) {
 				MorphLayer ml = mlList.get(i);
 				if (ml.select(v)) {
-					//					System.out.println("Layer " + i + " selected");
+					System.out.print("Layer " + i + " selected");
+					System.out.println(" has " + ml.getNMAs() + " anchors");
 					if(ml.getNMAs()>1){ //only try to interpolate if 2 or more anchors present in layer.
-						float [] interps = ml.interpolate(v);
+						MorphParameter [] interps = ml.interpolate(v);
 						System.out.print("Interp Values :");
 						for(int j=0;j<interps.length;j+=1){
-							System.out.print("\t " +parent.nf(interps[j], 2, 2));	
+							System.out.print("\t "
+									+interps[i].getName() +"\t "
+									+interps[i].getId() +"\t "
+									+parent.nf(interps[j].getValue(), 2, 2)+"\t "
+									);	
 
 						}
 						System.out.println();
 					}
-					keepChecking = false; //place inside above condition?
+
 				}
+				keepChecking = false; //place inside above condition?
 			}
 			if (keepChecking) {
 				// System.out.println(" Free space ");
@@ -520,7 +527,7 @@ public class MorphOSC implements PConstants {
 			for (int i = nMLayers - 1; i >= 0 && keepChecking; i--) {
 				MorphLayer tl = mlList.get(i);
 				if (tl.selectBar(v)) {
-					//					System.out.println(" Layer " + i + " bar selected");
+					//	System.out.println(" Layer " + i + " bar selected");
 					keepChecking = false;
 					movingLayer = i;
 					layerIsMoving = true;
@@ -531,7 +538,7 @@ public class MorphOSC implements PConstants {
 			for (int i = nMLayers - 1; i >= 0 && keepChecking; i--) {
 				MorphLayer tl = mlList.get(i);
 				if (tl.select(v)) {
-					System.out.println(" Layer " + i + " selected");
+					//System.out.println(" Layer " + i + " selected");
 					// Check if over a MorphAnchor on this layer
 					ArrayList mal = tl.getMAList();   
 					for(int j =0;j<mal.size();j+=1)
@@ -742,15 +749,38 @@ public class MorphOSC implements PConstants {
 		PVector v = v_;
 		setMouseVector(v);
 		if (guiIsLocked) {
-			for (int i = nMLayers - 1; i >= 0; i--) { // check from frontmost layer backwards
-				MorphLayer tl = mlList.get(i);
-				if (tl.select(v)) {
-					tl.isDraggingOnLayer = true;
-				} else {
-					tl.isDraggingOnLayer = false;
+			for (int i = nMLayers - 1; i >= 0; i--) { 
+				MorphLayer ml = mlList.get(i);
+				if (ml.select(v)) {
+					ml.isDraggingOnLayer = true;
+					//Drag on layer when locked to produce interpolated values
+					//from anchors.
+					if (ml.select(v)) {
+						System.out.print("Layer " + i + " selected");
+						System.out.println(" has " + ml.getNMAs() + " anchors");
+						if(ml.getNMAs()>1){ //only try to interpolate if 2 or more anchors present in layer.
+							MorphParameter [] interps = ml.interpolate(v);
+							System.out.print("Interp Values :");
+							for(int j=0;j<interps.length;j+=1){
+								System.out.print("\t "
+										+interps[i].getName() +"\t "
+										+interps[i].getId() +"\t "
+										+parent.nf(interps[j].getValue(), 2, 2)+"\t "
+										);	
+
+							}
+						}
+
+					}
 				}
-			}
-		} else if (!guiIsLocked) {
+
+				else {
+					ml.isDraggingOnLayer = false;
+				}
+
+			}//end for loop
+		} 
+		else if (!guiIsLocked) {
 			if (layerIsMoving) {
 				MorphLayer tlMove = mlList.get(movingLayer);
 				tlMove.move(v);
@@ -843,5 +873,11 @@ public class MorphOSC implements PConstants {
 
 		}
 	}
+
+	private void relay(){
+
+
+	}
+
 
 }
