@@ -21,6 +21,7 @@ import netP5.NetAddress;
  */
 public class MorphOSC implements PConstants {
 	PApplet parent;
+	//OscP5 oscP5;
 	// Defaults
 	int maxMParams = 32;
 	int nMParams = 0;
@@ -92,6 +93,7 @@ public class MorphOSC implements PConstants {
 		parent.registerMethod("mouseEvent", this);
 		parent.registerMethod("keyEvent", this);
 		createMouseHandler();
+		//oscP5 = new OscP5(this,8001);
 		addOSCAgent();
 
 	}
@@ -497,7 +499,7 @@ public class MorphOSC implements PConstants {
 	}
 	
 	void relayOSCMessage(String msg_){
-		//oscA.setMessage(msg_);
+		oscA.setMessage(msg_);
 	}
 	
 

@@ -24,53 +24,53 @@ public class OSCAgent {
 		//remoteAddrString = "192.168.42.175"; //laptop using ethernet tether
 		debugString = "OSC ok!";
 		portInit();
-		//addrInit();
+		addrInit();
 
 	}
 	//Open Sound Control//////////////////////////////////////////////////////////////
 	//Methods to change OSC addresses and port based on OSCSettings menu fields
-	//	int getOSCListenPort(){
-	//
-	//		return listenPort;
-	//	}
-	//	void setOSCListenPort(int listenPort_) {
-	//		listenPort = listenPort_;
-	//		//println("Changing OSC listening port to "+listenPort);
-	//		portInit();
-	//	}
-	//	int getOSCSendPort(){
-	//
-	//		return sendPort;
-	//	}
-	//	
-	//	void setOscSendPort(int sendPort_) {
-	//		sendPort = sendPort_;
-	//		//println("Changing OSC sending port to "+sendPort);
-	//		addrInit();
-	//	}
-	//	
-	//	String getOSCLocalAddr(){
-	//		return localAddrString;
-	//		
-	//	}
-	//	
-	//	void setOSCLocalAddr(String localAddrString_) {
-	//		localAddrString =localAddrString_;
-	//		//println("Changing OSC local address to "+localAddrString);
-	//		// No need to re-initalise OSC as listen port is not being changed.
-	//	}
-	//	
-	//	String getOSCRemoteAddr(){
-	//		return localAddrString;
-	//		
-	//	}
-	//	
-	//	void setOSCRemoteAddr(String remoteAddrString_) {
-	//		remoteAddrString =remoteAddrString_;
-	//		//println("Changing OSC remote address to "+remoteAddrString);
-	//		addrInit();
-	//	}
-	//
+		int getOSCListenPort(){
+	
+			return listenPort;
+		}
+		void setOSCListenPort(int listenPort_) {
+			listenPort = listenPort_;
+			//println("Changing OSC listening port to "+listenPort);
+			portInit();
+		}
+		int getOSCSendPort(){
+	
+			return sendPort;
+		}
+		
+		void setOscSendPort(int sendPort_) {
+			sendPort = sendPort_;
+			//println("Changing OSC sending port to "+sendPort);
+			addrInit();
+		}
+		
+		String getOSCLocalAddr(){
+			return localAddrString;
+			
+		}
+		
+		void setOSCLocalAddr(String localAddrString_) {
+			localAddrString =localAddrString_;
+			//println("Changing OSC local address to "+localAddrString);
+			// No need to re-initalise OSC as listen port is not being changed.
+		}
+		
+		String getOSCRemoteAddr(){
+			return localAddrString;
+			
+		}
+		
+		void setOSCRemoteAddr(String remoteAddrString_) {
+			remoteAddrString =remoteAddrString_;
+			//println("Changing OSC remote address to "+remoteAddrString);
+			addrInit();
+		}
+	
 	void portInit() {
 		/* This must be called at setup and whenever a port number is changed.*/
 		op5 = new OscP5(this, listenPort);
@@ -102,26 +102,26 @@ public class OSCAgent {
 	//	
 	//	/*Receive input from MorphOSC*/
 	//	
-	//	void setMessage(String msg_){
-	//		
-	//		String msg = msg_;
-	//		System.out.println("OSCAgent string to convert to OSC: "+msg);
-	////		int layerID = layerID_; 
-	////		int paramID = paramID_; 
-	////		String paramName =paramName_; 
-	////		float paramVal = paramVal_;
-	////		OscMessage omsg = new OscMessage("/morphosc");
-	////		omsg.add("l"+layerID); 
-	////		omsg.add("p"+paramID);
-	////		omsg.add("/");
-	//		/* send the message */
-	//		
-	//	}
-	//	/*Send out OSC messages to remote address and port*/
-	//	void send(OscMessage omsg_) {
-	//		//OscMessage omsg=omsg_;
-	//		//op5.send(omsg, remoteAddress);
-	//	}
+		void setMessage(String msg_){
+			
+			String msg = msg_;
+			System.out.println("OSCAgent string to convert to OSC: "+msg);
+	//		int layerID = layerID_; 
+	//		int paramID = paramID_; 
+	//		String paramName =paramName_; 
+	//		float paramVal = paramVal_;
+	//		OscMessage omsg = new OscMessage("/morphosc");
+	//		omsg.add("l"+layerID); 
+	//		omsg.add("p"+paramID);
+	//		omsg.add("/");
+			/* send the message */
+			
+		}
+		/*Send out OSC messages to remote address and port*/
+		void send(OscMessage omsg_) {
+			//OscMessage omsg=omsg_;
+			//op5.send(omsg, remoteAddress);
+		}
 	//	
 	//	/*Parse input received over OSC. Example below can parse TouchOSC data*/
 	//	
