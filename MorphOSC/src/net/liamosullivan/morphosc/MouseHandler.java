@@ -45,18 +45,25 @@ public class MouseHandler {
 				if (ml.select(v)) {
 					System.out.print("Layer " + i + " selected");
 					System.out.println(" has " + ml.getNMAs() + " anchors");
+					String msg = "l"+i;
 					if(ml.getNMAs()>1){ //only try to interpolate if 2 or more anchors present in layer.
 						MorphParameter [] interps = ml.interpolate(v);
 						System.out.print("Interp Values :");
+						
 						for(int j=0;j<interps.length;j+=1){
-							System.out.print("\t "
+							System.out.print("\t " 						//Interpolated output!!!
 									+interps[i].getName() +"\t "
 									+interps[i].getId() +"\t "
 									+PApplet.nf(interps[j].getValue(), 2, 2)+"\t "
-									);	
+									);
+							msg+="\t"+"p"+interps[i].getId();							
+							msg+="\t"+interps[j].getValue();
+							
 
 						}
 						System.out.println();
+						msg+="\n";
+						relayOSCMessage(msg);
 					}
 
 				}
@@ -432,6 +439,8 @@ public class MouseHandler {
 			}
 		}
 	}
+	
+	
 
 	void setMouseVector(PVector mv_) {
 		mouseVector = mv_;
@@ -442,6 +451,12 @@ public class MouseHandler {
 
 		return mouseVector;
 
+	}
+	
+	private void relayOSCMessage(String msg_){
+		String msg=msg_;
+		parent.relayOSCMessage(msg);
+		
 	}
 	
 }

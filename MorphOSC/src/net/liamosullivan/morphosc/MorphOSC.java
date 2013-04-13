@@ -10,7 +10,9 @@ import processing.core.PImage;
 import processing.core.PConstants;
 import processing.core.PVector;
 import processing.event.KeyEvent;
-import processing.event.MouseEvent;
+import processing.event.MouseEvent; 
+import oscP5.*;
+import netP5.NetAddress;
 
 /*TODO:
  * Add ability to drag multiple parameters to a layer at once e.g. using multi-select.
@@ -70,6 +72,7 @@ public class MorphOSC implements PConstants {
 	PVector mouseVector = new PVector(0, 0);
 	
 	private MouseHandler mouseHandler;
+	protected OSCAgent oscA;
 
 	public MorphOSC(PApplet p_) {
 
@@ -89,6 +92,7 @@ public class MorphOSC implements PConstants {
 		parent.registerMethod("mouseEvent", this);
 		parent.registerMethod("keyEvent", this);
 		createMouseHandler();
+		addOSCAgent();
 
 	}
 
@@ -487,7 +491,14 @@ public class MorphOSC implements PConstants {
 		return mouseVector;
 
 	}
+	void addOSCAgent(){
+		 oscA = new OSCAgent(this);
+		
+	}
 	
+	void relayOSCMessage(String msg_){
+		//oscA.setMessage(msg_);
+	}
 	
 
 
