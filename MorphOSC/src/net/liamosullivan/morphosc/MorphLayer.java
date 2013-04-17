@@ -8,19 +8,19 @@ public class MorphLayer extends InteractiveLayer
 {
 	PApplet parentApplet;
 	private ArrayList<MorphParameter> mpList = new ArrayList();
-	private int nMPs = 0; //number of MPs currently in layer
+	//private int nMPs = 0; //number of MPs currently in layer
 	private ArrayList<MorphAnchor> maList = new ArrayList();
-	int nMAs = 0; //number of MAs currently in layer
-	List<Float> distances = new ArrayList();
+	//int nMAs = 0; //number of MAs currently in layer
+	//List<Float> distances = new ArrayList();
 
 	PFont font;
 	PFont boldFont;
 	int textH = 22;
 	int ptSize = 10;
-	float PSize = 40.0F;
+	//float PSize = 40.0F;
 	int mpSwatchSize;
 	int anchorTextSize = 20;
-	boolean movePoint = false;
+	//boolean movePoint = false;
 	boolean removeMPWithLastMA = true; //does what it says
 
 	MorphLayer(PApplet p_, int id_, int x_, int y_, int w_, int h_, int fC_, int sC_, int dispW_, int dispH_)
@@ -48,13 +48,11 @@ public class MorphLayer extends InteractiveLayer
 	}
 
 	protected ArrayList getMPList(){
-
 		return mpList;
 	}
 
 	protected int getNMPs(){
-
-		return nMAs;
+		return mpList.size();
 	}
 
 	protected void addMorphAnchor(MorphAnchor ma_)
@@ -103,9 +101,9 @@ public class MorphLayer extends InteractiveLayer
 	void displayInterp() {
 		this.parentApplet.pushMatrix();
 		this.parentApplet.translate(this.lx, this.ly);
-		for (int j = 0; j < this.distances.size(); j++) {
-			float f = ((Float)this.distances.get(j)).floatValue();
-		}
+//		for (int j = 0; j < this.distances.size(); j++) {
+//			float f = ((Float)this.distances.get(j)).floatValue();
+//		}
 
 		this.parentApplet.popMatrix();
 	}

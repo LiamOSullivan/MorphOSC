@@ -11,11 +11,15 @@ import processing.core.PConstants;
 import processing.core.PVector;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
+import oscP5.*;
+import netP5.*;
 
 public class MouseHandler {
 
 	MorphOSC parent;
 	PVector mouseVector;
+	
+	
 	protected MouseHandler(MorphOSC parent_) {
 		parent = parent_;
 	}
@@ -24,8 +28,10 @@ public class MouseHandler {
 	protected void pressed(PVector v_) {
 		PVector v = v_;
 		setMouseVector(v);
-		if (parent.guiIsLocked) { // Gestures cause interpolated output when GUI is
-			// locked
+		
+		//////////////////////////////////////////////////////////////////GUI Locked
+		if (parent.guiIsLocked) { 
+			// Gestures cause interpolated output when GUI is locked
 			boolean keepChecking = true;
 			for (int i = 0; i < parent.nSafeZones && keepChecking; i += 1) { 
 				SafeZone sz = parent.sZoneList.get(i);
@@ -43,9 +49,7 @@ public class MouseHandler {
 			for (int i = parent.nMLayers - 1; i >= 0 && keepChecking; i--) {
 				MorphLayer ml = parent.mlList.get(i);
 				if (ml.select(v)) {
-					//					System.out.print("Layer " + i + " selected");
-					//					System.out.println(" has " + ml.getNMAs() + " anchors");
-					String msg = "l"+i;
+					OscMessage omsg = new OscMessage("/morphosc/");
 					if(ml.getNMAs()>1){ //only try to interpolate if 2 or more anchors present in layer.
 						MorphParameter [] interps = ml.interpolate(v);
 						//System.out.print("Interp Values :");
@@ -56,14 +60,13 @@ public class MouseHandler {
 							//									+interps[i].getId() +"\t "
 							//									+PApplet.nf(interps[j].getValue(), 2, 2)+"\t "
 							//									);
-							msg+="\t"+"p"+interps[i].getId();							
-							msg+="\t"+interps[j].getValue();
+							omsg.add(interps[i].getId());							
+							omsg.add(interps[i].getValue());
 
 
 						}
 						//System.out.println();
-						msg+="\n";
-						relayOSCMessage(msg);
+					relayOSCMessage(omsg);
 					}
 
 				}
@@ -73,7 +76,9 @@ public class MouseHandler {
 				// System.out.println(" Free space ");
 			}
 
-		} else if (!parent.guiIsLocked) {
+		}  
+		////////////////////////////////////////////////////////////////// GUI Unlocked
+		else if (!parent.guiIsLocked) {
 			boolean keepChecking = true;
 			// Check if over a SafeZone (GUI elements which exist in MorphOSC
 			// object)
@@ -83,7 +88,6 @@ public class MouseHandler {
 					//					System.out.println("Safe Zone " + sz.getId() + " selected");
 					if(sz.getId()==0){ //safe 0 is GUI lock toggle
 						parent.guiIsLocked=!parent.guiIsLocked;
-
 					}
 					keepChecking = false;
 
@@ -141,8 +145,8 @@ public class MouseHandler {
 					tl.setStartPosition(v);
 				}
 			}
-			// Check if over a MorphLayer 
-			for (int i = parent.nMLayers - 1; i >= 0 && keepChecking; i--) {
+			// Check if over a MorphLayer (check from front to back)
+			for (int i = parent.nMLayers-1 ; i >= 0 && keepChecking; i--) {
 				MorphLayer tl = parent.mlList.get(i);
 				if (tl.select(v)) {
 					//System.out.println(" Layer " + i + " selected");
@@ -177,6 +181,7 @@ public class MouseHandler {
 		// System.out.println("MousePressed");
 	}
 
+	///////////////////////////////////////////////////////////////////////Release Behavior
 	protected void released(PVector v_) {
 		PVector v = v_;
 		setMouseVector(v);
@@ -215,8 +220,10 @@ public class MouseHandler {
 			mpVDrag.setValue(parent.mpValue);
 			//System.out.println("Value of mpVDrag is "+mpValue);
 			// check if mouse released over any layers
-			for (int i = 0; i < parent.mlList.size(); i += 1) {
-				MorphLayer ml = parent.mlList.get(i);
+			for (int j = 0; j< parent.nMLayers; j++) {
+				//System.out.println("Getting layer #"+j);
+				MorphLayer ml = parent.mlList.get(j);
+				//System.out.println("Got layer #"+j);
 				if (ml.select(v)) {
 					//Get parent.mpList and maList list for the layer(s)
 					ArrayList mpl = (ArrayList)ml.getMPList();
@@ -224,6 +231,7 @@ public class MouseHandler {
 					//1. new MP is NOT in layer, there are NO MPs in Layer, there are NO anchors
 					//add new MP to layer, add MP to new MA, add MA to Layer
 					if (!mpl.contains(mpVDrag)&& mpl.size()==0 && mal.size()==0) {
+						System.out.println("Case 1");
 						//						System.out
 						//						.println("MorphParameter to be added to Layer "
 						//								+ i);
@@ -233,7 +241,7 @@ public class MouseHandler {
 						MorphAnchor maNew = new MorphAnchor(mal.size(), v); //id and position vector
 						maNew.addMorphParameter(mpVDrag);
 						maNew.setMorphParameterValueById(mpVDrag.getId(), parent.mpValue);
-						System.out.println("MorphAnchor #"+maNew.getId()+" to be added to Layer #"+ i);
+						System.out.println("MorphAnchor #"+maNew.getId()+" to be added to Layer #"+ j);
 						ml.addMorphAnchor(maNew); //adds MA to maList
 
 
@@ -242,11 +250,12 @@ public class MouseHandler {
 					//2. new MP is NOT in layer, there ARE MPs in Layer, there are NO anchors 
 					//add new MP to layer, add existing MPs (with values) to new anchor, add anchor 
 					else if (!mpl.contains(mpVDrag) && mpl.size()>0 && mal.size()==0){
+						System.out.println("Case 2");
 						ml.addMorphParameter(mpVDrag); 
 						MorphAnchor maNew = new MorphAnchor(mal.size(), v);
 						//System.out.println("Adding existing MPs to new Anchor");
-						for(int j=0;j<mpl.size();j+=1){
-							MorphParameter mpExists = (MorphParameter)mpl.get(j);  //TODO: get rid of cast
+						for(int p=0;p<mpl.size();p+=1){
+							MorphParameter mpExists = (MorphParameter)mpl.get(p);  //TODO: get rid of cast
 							maNew.addMorphParameter(mpExists);
 							maNew.setMorphParameterValueById(mpExists.getId(),mpExists.getValue()); //TODO: determine how to set values of MPs with existing MAs
 						}
@@ -256,18 +265,19 @@ public class MouseHandler {
 					//3. new MP is NOT in layer, there ARE MPs in Layer, there are ARE anchors 
 					//add new MP, add existing MPs to new MA, update all MAs with new MP, add MA 
 					else if (!mpl.contains(mpVDrag) && mpl.size()>0 && mal.size()>0){
+						System.out.println("Case 3");
 						ml.addMorphParameter(mpVDrag); 
 						MorphAnchor maNew = new MorphAnchor(mal.size(), v);
 						//Add all MPs to new MA
-						for(int j=0;j<mpl.size();j+=1){
-							MorphParameter mpExists = (MorphParameter)mpl.get(j);  //TODO: get rid of cast
+						for(int p=0;p<mpl.size();p+=1){
+							MorphParameter mpExists = (MorphParameter)mpl.get(p);  //TODO: get rid of cast
 							maNew.addMorphParameter(mpExists);
 							maNew.setMorphParameterValueById(mpExists.getId(),mpExists.getValue()); //TODO: determine how to set values of MPs with existing MAs
 							//							System.out.println("Existing MP #"+mpExists.getId()+" has value "+mpExists.getValue());
 						}
 						//update all anchors with all other params
-						for(int j=0;j<mal.size();j+=1){
-							MorphAnchor a = (MorphAnchor)mal.get(j);
+						for(int p=0;p<mal.size();p+=1){
+							MorphAnchor a = (MorphAnchor)mal.get(p);
 							ArrayList ampl = (ArrayList) a.getMPList();
 							if(!ampl.contains(mpVDrag)){   //TODO: does contains work okay here? What about values?
 								a.addMorphParameter(mpVDrag);
@@ -280,10 +290,12 @@ public class MouseHandler {
 					}
 					//4. MP in layer, so MPList size >0, but NO anchors
 					//
+					
 					else if (mpl.contains(mpVDrag) && mal.size()==0){
+						System.out.println("Case 4");
 						MorphAnchor maNew = new MorphAnchor(mal.size(), v);
-						for(int j=0;j<mpl.size();j+=1){
-							MorphParameter mpExists = (MorphParameter)mpl.get(j);  //TODO: get rid of cast
+						for(int p=0;p<mpl.size();p+=1){
+							MorphParameter mpExists = (MorphParameter)mpl.get(p);  //TODO: get rid of cast
 							maNew.addMorphParameter(mpExists);
 							maNew.setMorphParameterValueById(mpExists.getId(),mpExists.getValue()); //TODO: determine how to set values of MPs with existing MAs
 							//System.out.println("Existing MP #"+mpExists.getId()+" has value "+mpExists.getValue());
@@ -293,12 +305,13 @@ public class MouseHandler {
 					//5. MP in layer, there ARE anchors
 					//TODO: Add ability to drop values on existing anchors here
 					else if (mpl.contains(mpVDrag) && mal.size()>0){
+						System.out.println("Case 5");
 						//check if over an anchor, if so set the MP value, if not create anchor
 						boolean foundAnchor =false;
 						//TODO: use getter method instead of accessing maList
-						for(i=0; i<ml.getMAList().size();i+=1 ){
+						for(j=0; j<ml.getMAList().size();j+=1 ){
 							ArrayList mas = ml.getMAList();
-							MorphAnchor ma = (MorphAnchor)mas.get(i);
+							MorphAnchor ma = (MorphAnchor)mas.get(j);
 							if(ma.select(PVector.sub(v, ml.getPosition()))){
 								ma.setMorphParameterValueById(mpVDrag.getId(), parent.mpValue);
 								System.out.println("Over existing anchor!");
@@ -307,8 +320,8 @@ public class MouseHandler {
 						}
 						if(!foundAnchor){
 							MorphAnchor maNew = new MorphAnchor(mal.size(), v);
-							for(int j=0;j<mpl.size();j+=1){
-								MorphParameter mpExists = (MorphParameter)mpl.get(j);  //TODO: get rid of cast
+							for(int p=0;p<mpl.size();p+=1){
+								MorphParameter mpExists = (MorphParameter)mpl.get(p);  //TODO: get rid of cast
 								maNew.addMorphParameter(mpExists);
 								maNew.setMorphParameterValueById(mpExists.getId(),mpExists.getValue()); //TODO: determine how to set values of MPs with existing MAs
 								//System.out.println("Existing MP #"+mpExists.getId()+" has value "+mpExists.getValue());
@@ -316,8 +329,8 @@ public class MouseHandler {
 							ml.addMorphAnchor(maNew); //adds MA to maList
 							//update all anchors with all other params
 						}
-						for(int j=0;j<mal.size();j+=1){
-							MorphAnchor a = (MorphAnchor)mal.get(j);
+						for(int p=0;p<mal.size();p+=1){
+							MorphAnchor a = (MorphAnchor)mal.get(p);
 							ArrayList ampl = (ArrayList) a.getMPList();
 							if(!ampl.contains(mpVDrag)){   //TODO: does contains work okay here? What about values?
 								a.addMorphParameter(mpVDrag);
@@ -363,7 +376,8 @@ public class MouseHandler {
 					//Drag on layer when locked to produce interpolated values
 					//from anchors.
 					if (ml.select(v)) {
-						String msg = "l"+i;
+						//String msg = "l"+i;
+						OscMessage omsg = new OscMessage("/morphOSC/");
 						//						System.out.print("Layer " + i + " selected");
 						//						System.out.println(" has " + ml.getNMAs() + " anchors");
 						if(ml.getNMAs()>1){ //only try to interpolate if 2 or more anchors present in layer.
@@ -376,13 +390,12 @@ public class MouseHandler {
 								//										+PApplet.nf(interps[j].getValue(), 2, 2)+"\t "
 								//										);
 
-								msg+="\t"+"p"+interps[i].getId();							
-								msg+="\t"+interps[j].getValue();
+								omsg.add(interps[i].getId());							
+								omsg.add(interps[i].getValue());
 
 
 							}
-							msg+="\n";
-							relayOSCMessage(msg);
+							relayOSCMessage(omsg);
 
 						}
 
@@ -410,7 +423,6 @@ public class MouseHandler {
 				ma.move(PVector.sub(v, parent.mlList.get(parent.getMLayerIndexById(parent.dragMAnchorID[0])).getPosition()));
 				System.out.println("Dragging MorphAnchor");
 			}
-
 
 		}
 
@@ -447,9 +459,7 @@ public class MouseHandler {
 			}
 		}
 	}
-
-
-
+	
 	void setMouseVector(PVector mv_) {
 		mouseVector = mv_;
 
@@ -461,9 +471,9 @@ public class MouseHandler {
 
 	}
 
-	private void relayOSCMessage(String msg_){
-		String msg=msg_;
-		parent.relayOSCMessage(msg);
+	private void relayOSCMessage(OscMessage omsg_){
+		OscMessage omsg = omsg_;
+		parent.relayOSCMessage(omsg);
 
 	}
 

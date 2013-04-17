@@ -498,10 +498,9 @@ public class MorphOSC implements PConstants {
 		
 	}
 	
-	void relayOSCMessage(String msg_){
+	void relayOSCMessage(OscMessage msg_){
 		oscA.setMessage(msg_);
+		oscA.send();
 	}
 	
-
-
 }

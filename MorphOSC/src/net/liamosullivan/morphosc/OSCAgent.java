@@ -9,6 +9,7 @@ public class OSCAgent {
 	//Open Sound Control variables//////////////////////////
 	MorphOSC parent;
 	OscP5 op5;
+	OscMessage omsg;
 	NetAddress localAddress, remoteAddress;
 	int listenPort, sendPort;
 	String localAddrString, remoteAddrString, debugString;
@@ -102,25 +103,13 @@ public class OSCAgent {
 	//	
 	//	/*Receive input from MorphOSC*/
 	//	
-		void setMessage(String msg_){
-			
-			String msg = msg_;
-			System.out.println("OSCAgent string to convert to OSC: "+msg);
-	//		int layerID = layerID_; 
-	//		int paramID = paramID_; 
-	//		String paramName =paramName_; 
-	//		float paramVal = paramVal_;
-	//		OscMessage omsg = new OscMessage("/morphosc");
-	//		omsg.add("l"+layerID); 
-	//		omsg.add("p"+paramID);
-	//		omsg.add("/");
-			/* send the message */
-			
+		void setMessage(OscMessage omsg_){
+		omsg=omsg_;
+						
 		}
 		/*Send out OSC messages to remote address and port*/
-		void send(OscMessage omsg_) {
-			//OscMessage omsg=omsg_;
-			//op5.send(omsg, remoteAddress);
+		void send() {
+			op5.send(omsg, remoteAddress);
 		}
 	//	
 	//	/*Parse input received over OSC. Example below can parse TouchOSC data*/
