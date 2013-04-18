@@ -483,22 +483,22 @@ public class MorphOSC implements PConstants {
 		mouseHandler = new MouseHandler(this);
 	
 	}
-	void setMouseVector(PVector mv_) {
+	protected void setMouseVector(PVector mv_) {
 		mouseVector = mv_;
 
 	}
 
-	PVector getMouseVector() {
+	protected PVector getMouseVector() {
 
 		return mouseVector;
 
 	}
-	void addOSCAgent(){
+	private void addOSCAgent(){
 		 oscA = new OSCAgent(this);
 		
 	}
 	
-	void relayOSCMessage(OscMessage msg_){
+	protected void relayOSCMessage(OscMessage msg_){
 		oscA.setMessage(msg_);
 		oscA.send();
 	}

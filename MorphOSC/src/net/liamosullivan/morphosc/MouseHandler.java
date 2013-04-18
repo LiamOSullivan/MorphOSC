@@ -46,24 +46,19 @@ public class MouseHandler {
 			}
 			//Press on layers when locked to produce interpolated values
 			//from anchors.
+			
 			for (int i = parent.nMLayers - 1; i >= 0 && keepChecking; i--) {
 				MorphLayer ml = parent.mlList.get(i);
 				if (ml.select(v)) {
-					OscMessage omsg = new OscMessage("/morphosc/");
+					OscMessage omsg = new OscMessage("/morphosc");
+					omsg.add(ml.getId());
+					omsg.add(ml.getNMPs()); //add the number of MPs so that they can be parsed at OSC server
 					if(ml.getNMAs()>1){ //only try to interpolate if 2 or more anchors present in layer.
 						MorphParameter [] interps = ml.interpolate(v);
 						//System.out.print("Interp Values :");
-
 						for(int j=0;j<interps.length;j+=1){
-							//							System.out.print("\t " 						//Interpolated output!!!
-							//									+interps[i].getName() +"\t "
-							//									+interps[i].getId() +"\t "
-							//									+PApplet.nf(interps[j].getValue(), 2, 2)+"\t "
-							//									);
-							omsg.add(interps[i].getId());							
-							omsg.add(interps[i].getValue());
-
-
+							omsg.add(interps[j].getId());							
+							omsg.add(interps[j].getValue());
 						}
 						//System.out.println();
 					relayOSCMessage(omsg);
@@ -376,25 +371,26 @@ public class MouseHandler {
 					//Drag on layer when locked to produce interpolated values
 					//from anchors.
 					if (ml.select(v)) {
-						//String msg = "l"+i;
-						OscMessage omsg = new OscMessage("/morphOSC/");
+						//String msg = "layer"+i;
+						OscMessage omsg = new OscMessage("/morphOSC");
+						omsg.add(ml.getId());
+						omsg.add(ml.getNMPs()); //add the number of MPs so that they can be parsed at OSC server
 						//						System.out.print("Layer " + i + " selected");
 						//						System.out.println(" has " + ml.getNMAs() + " anchors");
 						if(ml.getNMAs()>1){ //only try to interpolate if 2 or more anchors present in layer.
 							MorphParameter [] interps = ml.interpolate(v);
 							//System.out.print("Interp Values :");
 							for(int j=0;j<interps.length;j+=1){
-								//								System.out.print("\t "
-								//										+interps[i].getName() +"\t "
-								//										+interps[i].getId() +"\t "
-								//										+PApplet.nf(interps[j].getValue(), 2, 2)+"\t "
-								//										);
+								System.out.print("\t "								
+								//+interps[i].getName() +"\t "
+								+interps[j].getId() +"\t "
+								+PApplet.nf(interps[j].getValue(), 2, 2)+"\t "
+								);
 
-								omsg.add(interps[i].getId());							
-								omsg.add(interps[i].getValue());
-
-
+								omsg.add(interps[j].getId());							
+								omsg.add(interps[j].getValue());
 							}
+							System.out.println();
 							relayOSCMessage(omsg);
 
 						}
