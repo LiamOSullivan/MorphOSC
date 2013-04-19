@@ -72,6 +72,8 @@ public class MorphOSC implements PConstants {
 	int [] dragMAnchorID = {-1,-1}; //id of layer and anchor
 	PVector mouseVector = new PVector(0, 0);
 	
+	boolean addAnchorsToAllLayers = false;
+	
 	private MouseHandler mouseHandler;
 	protected OSCAgent oscA;
 

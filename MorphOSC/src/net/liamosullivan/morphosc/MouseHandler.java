@@ -215,7 +215,7 @@ public class MouseHandler {
 			mpVDrag.setValue(parent.mpValue);
 			//System.out.println("Value of mpVDrag is "+mpValue);
 			// check if mouse released over any layers
-			for (int j = 0; j< parent.nMLayers; j++) {
+			for (int j= parent.nMLayers-1;j>=0 && keepChecking; j--) {
 				//System.out.println("Getting layer #"+j);
 				MorphLayer ml = parent.mlList.get(j);
 				//System.out.println("Got layer #"+j);
@@ -227,9 +227,6 @@ public class MouseHandler {
 					//add new MP to layer, add MP to new MA, add MA to Layer
 					if (!mpl.contains(mpVDrag)&& mpl.size()==0 && mal.size()==0) {
 						System.out.println("Case 1");
-						//						System.out
-						//						.println("MorphParameter to be added to Layer "
-						//								+ i);
 						ml.addMorphParameter(mpVDrag);
 						//No MPs means no existing anchors, so just
 						//Add an anchor and add the MP and value to it...
@@ -238,8 +235,6 @@ public class MouseHandler {
 						maNew.setMorphParameterValueById(mpVDrag.getId(), parent.mpValue);
 						System.out.println("MorphAnchor #"+maNew.getId()+" to be added to Layer #"+ j);
 						ml.addMorphAnchor(maNew); //adds MA to maList
-
-
 					}
 
 					//2. new MP is NOT in layer, there ARE MPs in Layer, there are NO anchors 
@@ -255,6 +250,7 @@ public class MouseHandler {
 							maNew.setMorphParameterValueById(mpExists.getId(),mpExists.getValue()); //TODO: determine how to set values of MPs with existing MAs
 						}
 						ml.addMorphAnchor(maNew); //adds MA to maList
+						
 					}
 
 					//3. new MP is NOT in layer, there ARE MPs in Layer, there are ARE anchors 
@@ -272,7 +268,7 @@ public class MouseHandler {
 								MorphParameter mpExists = (MorphParameter)mpl.get(p);  //TODO: get rid of cast
 								maNew.addMorphParameter(mpExists);
 								maNew.setMorphParameterValueById(mpExists.getId(),mpExists.getValue()); //TODO: determine how to set values of MPs with existing MAs
-								
+
 								//System.out.println("Existing MP #"+mpExists.getId()+" has value "+mpExists.getValue());
 							}
 							ml.addMorphAnchor(maNew); //adds MA to maList
@@ -286,7 +282,7 @@ public class MouseHandler {
 							ma.addMorphParameter(mpVDrag);
 							System.out.println("parent.mpValue: "+parent.mpValue);
 							ma.setMorphParameterValueById(mpVDrag.getId(), parent.mpValue);
-							
+
 							//System.out.println("Over existing anchor!");
 						}
 						//update all anchors with all other params
@@ -298,10 +294,9 @@ public class MouseHandler {
 
 							}
 						}
+						
 					}
 					//4. MP in layer, so MPList size >0, but NO anchors
-					//
-
 					else if (mpl.contains(mpVDrag) && mal.size()==0){
 						System.out.println("Case 4");
 						MorphAnchor maNew = new MorphAnchor(mal.size(), v);
@@ -335,7 +330,7 @@ public class MouseHandler {
 							ma.setMorphParameterValueById(mpVDrag.getId(), parent.mpValue);
 							//System.out.println("Over existing anchor!");
 						}
-						
+
 						for(int p=0;p<mal.size();p+=1){
 							MorphAnchor a = (MorphAnchor)mal.get(p);
 							ArrayList ampl = (ArrayList) a.getMPList();
@@ -344,6 +339,9 @@ public class MouseHandler {
 
 							}
 						}
+					}
+					if(!parent.addAnchorsToAllLayers){ //move this out if buggy
+						keepChecking=false;
 					}
 
 				}
