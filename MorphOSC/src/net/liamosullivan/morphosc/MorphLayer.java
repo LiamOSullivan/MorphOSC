@@ -34,12 +34,12 @@ public class MorphLayer extends InteractiveLayer
 		MorphParameter mp = mp_;
 		if(!mpList.contains(mp)){
 			this.mpList.add(mp);
-			System.out.println("MorphParam "+mp.getId()+" added to layer "+ this.id);
-			System.out.println("Current Value is "+mp.getValue());
+			//System.out.println("MorphParam "+mp.getId()+" added to layer "+ this.id);
+			//System.out.println("Current Value is "+mp.getValue());
 		}
 		else{
-			System.out.println("MorphParam "+mp.getId()+" already in layer "+ this.id);
-			System.out.println("Current Value is "+mp.getValue());
+			//System.out.println("MorphParam "+mp.getId()+" already in layer "+ this.id);
+			//System.out.println("Current Value is "+mp.getValue());
 		}
 	}
 

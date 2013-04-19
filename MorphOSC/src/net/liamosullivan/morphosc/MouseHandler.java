@@ -18,8 +18,8 @@ public class MouseHandler {
 
 	MorphOSC parent;
 	PVector mouseVector;
-	
-	
+
+
 	protected MouseHandler(MorphOSC parent_) {
 		parent = parent_;
 	}
@@ -28,7 +28,7 @@ public class MouseHandler {
 	protected void pressed(PVector v_) {
 		PVector v = v_;
 		setMouseVector(v);
-		
+
 		//////////////////////////////////////////////////////////////////GUI Locked
 		if (parent.guiIsLocked) { 
 			// Gestures cause interpolated output when GUI is locked
@@ -46,7 +46,7 @@ public class MouseHandler {
 			}
 			//Press on layers when locked to produce interpolated values
 			//from anchors.
-			
+
 			for (int i = parent.nMLayers - 1; i >= 0 && keepChecking; i--) {
 				MorphLayer ml = parent.mlList.get(i);
 				if (ml.select(v)) {
@@ -61,7 +61,7 @@ public class MouseHandler {
 							omsg.add(interps[j].getValue());
 						}
 						//System.out.println();
-					relayOSCMessage(omsg);
+						relayOSCMessage(omsg);
 					}
 
 				}
@@ -258,17 +258,36 @@ public class MouseHandler {
 					}
 
 					//3. new MP is NOT in layer, there ARE MPs in Layer, there are ARE anchors 
-					//add new MP, add existing MPs to new MA, update all MAs with new MP, add MA 
+					//add new MP, if over anchor- add param to anchor 
+					//if not- create anchor, add existing MPs to new MA, 
+					//update all MAs with new MP, add MA 
 					else if (!mpl.contains(mpVDrag) && mpl.size()>0 && mal.size()>0){
 						System.out.println("Case 3");
-						ml.addMorphParameter(mpVDrag); 
-						MorphAnchor maNew = new MorphAnchor(mal.size(), v);
-						//Add all MPs to new MA
-						for(int p=0;p<mpl.size();p+=1){
-							MorphParameter mpExists = (MorphParameter)mpl.get(p);  //TODO: get rid of cast
-							maNew.addMorphParameter(mpExists);
-							maNew.setMorphParameterValueById(mpExists.getId(),mpExists.getValue()); //TODO: determine how to set values of MPs with existing MAs
-							//							System.out.println("Existing MP #"+mpExists.getId()+" has value "+mpExists.getValue());
+						ml.addMorphParameter(mpVDrag);
+						int anchorIndex = checkOverAnchor(v, mpVDrag, ml);
+						if(anchorIndex == -1){
+							MorphAnchor maNew = new MorphAnchor(mal.size(), v);
+							for(int p=0;p<mpl.size();p+=1){
+								System.out.println("Debug 1");
+								MorphParameter mpExists = (MorphParameter)mpl.get(p);  //TODO: get rid of cast
+								maNew.addMorphParameter(mpExists);
+								maNew.setMorphParameterValueById(mpExists.getId(),mpExists.getValue()); //TODO: determine how to set values of MPs with existing MAs
+								
+								//System.out.println("Existing MP #"+mpExists.getId()+" has value "+mpExists.getValue());
+							}
+							ml.addMorphAnchor(maNew); //adds MA to maList
+							//update all anchors with all other params
+							//Add all MPs to new MA//							
+						}
+						else{
+							System.out.println("Debug 2");
+							ArrayList mas = ml.getMAList();
+							MorphAnchor ma = (MorphAnchor)mas.get(anchorIndex);
+							ma.addMorphParameter(mpVDrag);
+							System.out.println("parent.mpValue: "+parent.mpValue);
+							ma.setMorphParameterValueById(mpVDrag.getId(), parent.mpValue);
+							
+							//System.out.println("Over existing anchor!");
 						}
 						//update all anchors with all other params
 						for(int p=0;p<mal.size();p+=1){
@@ -279,13 +298,10 @@ public class MouseHandler {
 
 							}
 						}
-
-						ml.addMorphAnchor(maNew); //adds MA to maList
-
 					}
 					//4. MP in layer, so MPList size >0, but NO anchors
 					//
-					
+
 					else if (mpl.contains(mpVDrag) && mal.size()==0){
 						System.out.println("Case 4");
 						MorphAnchor maNew = new MorphAnchor(mal.size(), v);
@@ -302,18 +318,8 @@ public class MouseHandler {
 					else if (mpl.contains(mpVDrag) && mal.size()>0){
 						System.out.println("Case 5");
 						//check if over an anchor, if so set the MP value, if not create anchor
-						boolean foundAnchor =false;
-						//TODO: use getter method instead of accessing maList
-						for(j=0; j<ml.getMAList().size();j+=1 ){
-							ArrayList mas = ml.getMAList();
-							MorphAnchor ma = (MorphAnchor)mas.get(j);
-							if(ma.select(PVector.sub(v, ml.getPosition()))){
-								ma.setMorphParameterValueById(mpVDrag.getId(), parent.mpValue);
-								System.out.println("Over existing anchor!");
-								foundAnchor =true;
-							}
-						}
-						if(!foundAnchor){
+						int anchorIndex = checkOverAnchor(v, mpVDrag, ml);
+						if(anchorIndex == -1){
 							MorphAnchor maNew = new MorphAnchor(mal.size(), v);
 							for(int p=0;p<mpl.size();p+=1){
 								MorphParameter mpExists = (MorphParameter)mpl.get(p);  //TODO: get rid of cast
@@ -324,6 +330,12 @@ public class MouseHandler {
 							ml.addMorphAnchor(maNew); //adds MA to maList
 							//update all anchors with all other params
 						}
+						else{
+							MorphAnchor ma = (MorphAnchor)mal.get(anchorIndex); 
+							ma.setMorphParameterValueById(mpVDrag.getId(), parent.mpValue);
+							//System.out.println("Over existing anchor!");
+						}
+						
 						for(int p=0;p<mal.size();p+=1){
 							MorphAnchor a = (MorphAnchor)mal.get(p);
 							ArrayList ampl = (ArrayList) a.getMPList();
@@ -382,10 +394,10 @@ public class MouseHandler {
 							//System.out.print("Interp Values :");
 							for(int j=0;j<interps.length;j+=1){
 								System.out.print("\t "								
-								//+interps[i].getName() +"\t "
-								+interps[j].getId() +"\t "
-								+PApplet.nf(interps[j].getValue(), 2, 2)+"\t "
-								);
+										//+interps[i].getName() +"\t "
+										+interps[j].getId() +"\t "
+										+PApplet.nf(interps[j].getValue(), 2, 2)+"\t "
+										);
 
 								omsg.add(interps[j].getId());							
 								omsg.add(interps[j].getValue());
@@ -455,7 +467,20 @@ public class MouseHandler {
 			}
 		}
 	}
-	
+
+	int checkOverAnchor(PVector v_, MorphParameter mp_, MorphLayer ml_){
+		for(int j=0; j<ml_.getMAList().size();j+=1 ){
+			ArrayList mas = ml_.getMAList();
+			MorphAnchor ma = (MorphAnchor)mas.get(j);
+			if(ma.select(PVector.sub(v_, ml_.getPosition()))){
+				//return ma.getId();
+				return j;
+			}
+		}
+		return -1;
+
+	}
+
 	void setMouseVector(PVector mv_) {
 		mouseVector = mv_;
 

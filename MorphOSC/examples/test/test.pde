@@ -1,3 +1,7 @@
+/*
+Test sketch for MorphOSC
+
+*/
 import net.liamosullivan.morphosc.*;
 import controlP5.*;
 

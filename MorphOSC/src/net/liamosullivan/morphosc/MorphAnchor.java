@@ -120,7 +120,7 @@ public class MorphAnchor
 		float disX = p.x- pv.x;
 		float disY = p.y- pv.y;
 		if (Math.sqrt(disX*disX + disY*disY) < s) { //check circular area
-			System.out.println("***MA selected");
+			//System.out.println("***MA selected");
 			return true;
 		}
 
