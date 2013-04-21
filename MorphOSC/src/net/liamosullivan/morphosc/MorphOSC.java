@@ -52,6 +52,7 @@ public class MorphOSC implements PConstants {
 	// GUI interaction
 	public boolean highlightControllers = true; // color controllers added as
 	// MorphParameters
+	public boolean useControlFrame= false;
 
 	// Interaction flags
 	public boolean guiIsLocked = false;
@@ -76,6 +77,7 @@ public class MorphOSC implements PConstants {
 	
 	private MouseHandler mouseHandler;
 	protected OSCAgent oscA;
+	protected MorphView gui;
 
 	public MorphOSC(PApplet p_) {
 
@@ -85,7 +87,7 @@ public class MorphOSC implements PConstants {
 		mlFillColors = generateLayerFills(maxMLayers);
 		mlStrokeColors = generateLayerStrokes(maxMLayers);
 
-		parent.colorMode(3, 255.0F);
+		parent.colorMode(HSB, 255.0F);
 		parent.rectMode(CENTER);
 		parent.ellipseMode(CENTER);
 
@@ -94,9 +96,14 @@ public class MorphOSC implements PConstants {
 		parent.registerMethod("dispose", this);
 		parent.registerMethod("mouseEvent", this);
 		parent.registerMethod("keyEvent", this);
-		createMouseHandler();
+		addMouseHandler();
+		addMorphView();
+		if(useControlFrame){
+			gui.addControlFrame();
+		}
 		//oscP5 = new OscP5(this,8001);
 		addOSCAgent();
+		
 
 	}
 
@@ -481,7 +488,7 @@ public class MorphOSC implements PConstants {
 
 	}
 	
-	protected void createMouseHandler(){
+	protected void addMouseHandler(){
 		mouseHandler = new MouseHandler(this);
 	
 	}
@@ -495,6 +502,11 @@ public class MorphOSC implements PConstants {
 		return mouseVector;
 
 	}
+	
+	private void addMorphView(){
+		gui = new MorphView(parent);		
+	}
+	
 	private void addOSCAgent(){
 		 oscA = new OSCAgent(this);
 		

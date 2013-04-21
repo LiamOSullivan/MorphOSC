@@ -333,6 +333,13 @@ void interpSliders() {
   cp5.getController("nFmDist").changeValue(cs.getChn("nFmDist"));
   cp5.getController("GrTransp").changeValue(cs.getChn("GrTransp"));
   cp5.getController("nFmFreqLinear").changeValue(cs.getChn("nFmFreq"));
+  s2d.changeValue(0.0);
+    float [] xy = e.getArrayValue();
+    println("Got an event from 2-D slider "+e.getName()+"\t values: "+xy[0]+", "+xy[1]);
+    cs.setChn("JoyX", xy[0]);
+    cs.setChn("JoyY", xy[1]);
+  }
+  
 }
 
 void controlEvent(ControlEvent e) {
