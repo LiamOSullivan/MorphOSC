@@ -6,7 +6,7 @@ import java.awt.Frame;
 import java.awt.BorderLayout;
 public class MorphView {
 	PApplet parent;
-	ControlFrame cf;
+	ControllerFrame cf;
 	ControlP5 cp5;
 
 	public MorphView(PApplet parent_) {
@@ -16,11 +16,4 @@ public class MorphView {
 
 
 	}
-
-	void addControlFrame(){
-		cf = addControlFrame("GUI", parent.width/2, parent.height/2 );
-		
-	}
-
-
 }

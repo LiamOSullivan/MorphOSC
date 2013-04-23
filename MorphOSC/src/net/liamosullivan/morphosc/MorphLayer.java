@@ -112,7 +112,6 @@ public class MorphLayer extends InteractiveLayer
 		for (int j = 0; j < this.maList.size(); j++) {
 			MorphAnchor localMorphAnchor = (MorphAnchor)this.maList.get(j);
 		}
-
 		return false;
 	}
 
@@ -134,8 +133,6 @@ public class MorphLayer extends InteractiveLayer
 			interpMP[i].setValue(was[i]);
 		}
 		return interpMP;
-
-
 	}
 
 	private float[] getInvDistances(PVector p_) {

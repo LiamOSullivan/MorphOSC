@@ -35,7 +35,7 @@ public class MorphOSC implements PConstants {
 	int colourPad = 10;
 	// Display assets
 	PImage locked, unlocked;
-	private float lockX, lockY; // position of the GUI lock/unlock button
+	private float lockX, lockY; // position of the secondView lock/unlock button
 	int lockImageScale = 4;
 
 	int nSafeZones = 0;
@@ -48,8 +48,8 @@ public class MorphOSC implements PConstants {
 	// being dragged-and-dropped.
 
 	// Setup options
-	public boolean addLayersFromGUI = true; // add MorphLayers at runtime with
-	// GUI interaction
+	public boolean addLayersFromsecondView = true; // add MorphLayers at runtime with
+	// secondView interaction
 	public boolean highlightControllers = true; // color controllers added as
 	// MorphParameters
 	public boolean useControlFrame= false;
@@ -77,12 +77,12 @@ public class MorphOSC implements PConstants {
 	
 	private MouseHandler mouseHandler;
 	protected OSCAgent oscA;
-	protected MorphView gui;
+	protected ControllerFrame secondView;
 
 	public MorphOSC(PApplet p_) {
 
 		parent = p_;
-		initGUI();
+		initsecondView();
 		paramColors = generateParamColors(maxMParams);
 		mlFillColors = generateLayerFills(maxMLayers);
 		mlStrokeColors = generateLayerStrokes(maxMLayers);
@@ -97,9 +97,9 @@ public class MorphOSC implements PConstants {
 		parent.registerMethod("mouseEvent", this);
 		parent.registerMethod("keyEvent", this);
 		addMouseHandler();
-		addMorphView();
+		//addMorphView();
 		if(useControlFrame){
-			gui.addControlFrame();
+			secondView.addControlFrame("GUI2", 500,500);
 		}
 		//oscP5 = new OscP5(this,8001);
 		addOSCAgent();
@@ -107,7 +107,7 @@ public class MorphOSC implements PConstants {
 
 	}
 
-	private void initGUI() {
+	private void initsecondView() {
 
 		try {
 			locked = parent.loadImage("data/lock_lock_01_small.jpg");
@@ -125,9 +125,9 @@ public class MorphOSC implements PConstants {
 			lockX = 50;
 			lockY = parent.height-unlocked.height;
 		}
-		// SafeZones for GUI elements
+		// SafeZones for secondView elements
 		SafeZone lock = new SafeZone(parent, nSafeZones, lockX, lockY,
-				(float) locked.width, (float) locked.height); //GUI lock
+				(float) locked.width, (float) locked.height); //secondView lock
 		lock.setId(nSafeZones);
 		sZoneList.add(lock); 
 		nSafeZones += 1;
@@ -204,7 +204,7 @@ public class MorphOSC implements PConstants {
 			mpList.add(mp);
 			nMParams += 1;
 			SafeZone sz = new SafeZone(parent, nSafeZones, c.getPosition().x, 
-					c.getPosition().y-c.getHeight()/4,(float) c.getWidth(), (float) c.getHeight()); //GUI lock
+					c.getPosition().y-c.getHeight()/4,(float) c.getWidth(), (float) c.getHeight()); //secondView lock
 			sz.setId(nSafeZones);
 			sZoneList.add(sz); 
 			//System.out.println("Safe Zone #"+sz.getId()+" added to controller #"+c.getId());
@@ -350,11 +350,11 @@ public class MorphOSC implements PConstants {
 
 	}
 	
-	protected void setGUILockStatus(boolean set_){
+	protected void setsecondViewLockStatus(boolean set_){
 		guiIsLocked = set_;
 	}
 	
-	protected boolean getGUILockStatus(){
+	protected boolean getsecondViewLockStatus(){
 		return guiIsLocked;
 		
 	}
@@ -367,11 +367,11 @@ public class MorphOSC implements PConstants {
 	}
 
 	public void draw() {
-		displayGUI();
+		displaysecondView();
 		// System.out.println("Draw called");
 	}
 
-	private void displayGUI() {
+	private void displaysecondView() {
 
 		for (int i = 0; i < mlList.size(); i += 1) {
 			MorphLayer ml = mlList.get(i);
@@ -503,9 +503,9 @@ public class MorphOSC implements PConstants {
 
 	}
 	
-	private void addMorphView(){
-		gui = new MorphView(parent);		
-	}
+//	private void addMorphView(){
+//		secondView = new ControlFrame("GUI", 500,500);		
+//	}
 	
 	private void addOSCAgent(){
 		 oscA = new OSCAgent(this);

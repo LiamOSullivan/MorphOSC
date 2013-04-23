@@ -36,10 +36,10 @@ void mousePressed() {
 }
 
 void oscEvent(OscMessage mosc) {
-  println("Received an OSC message: "+mosc);
-  println( " Address pattern: "+mosc.addrPattern());
+  print("Received an OSC message: "+mosc);
+  print( " Address pattern: "+mosc.addrPattern());
   println(" | TypeTag: "+mosc.typetag());
-  println("Layer = "+mosc.get(0).intValue()); //Layer ID
+  print("Layer = "+mosc.get(0).intValue()); //Layer ID
   int nMPs = mosc.get(1).intValue();
   println("#MPs = "+nMPs); //#params in layer
   //print("Param #0: "+mosc.get(0+nMPs).intValue());
