@@ -2,6 +2,9 @@ package net.liamosullivan.morphosc;
 
 import controlP5.ControlEvent;
 import controlP5.Controller;
+import controlP5.Toggle;
+import controlP5.Slider;
+import controlP5.ControlP5;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +24,7 @@ import netP5.NetAddress;
  */
 public class MorphOSC implements PConstants {
 	PApplet parent;
+	ControlP5 cp5;
 	//OscP5 oscP5;
 	// Defaults
 	int maxMParams = 32;
@@ -35,11 +39,9 @@ public class MorphOSC implements PConstants {
 	int colourPad = 10;
 	// Display assets
 	PImage locked, unlocked;
-	private float lockX, lockY; // position of the secondView lock/unlock button
+	Toggle lock;
+	private float lockX, lockY; // position of the GUI lock/unlock button
 	int lockImageScale = 4;
-
-	int nSafeZones = 0;
-
 	List<Controller> cList = new ArrayList();
 	List<MorphParameter> mpList = new ArrayList();
 	List<MorphLayer> mlList = new ArrayList<MorphLayer>();
@@ -48,14 +50,14 @@ public class MorphOSC implements PConstants {
 	// being dragged-and-dropped.
 
 	// Setup options
-	public boolean addLayersFromsecondView = true; // add MorphLayers at runtime with
-	// secondView interaction
+	public boolean addLayersFromGUI = true; // add MorphLayers at runtime with
+	// GUI interaction
 	public boolean highlightControllers = true; // color controllers added as
 	// MorphParameters
 	public boolean useControlFrame= false;
 
 	// Interaction flags
-	public boolean guiIsLocked = false;
+	public boolean IsLocked = false;
 	public boolean showMenu = false;
 	boolean layerIsMoving = false, layerIsResizing = false, isOver = false;
 	int movingLayer = 0;
@@ -72,17 +74,17 @@ public class MorphOSC implements PConstants {
 	boolean isDraggingMAnchor = false;
 	int [] dragMAnchorID = {-1,-1}; //id of layer and anchor
 	PVector mouseVector = new PVector(0, 0);
-	
+
 	boolean addAnchorsToAllLayers = false;
-	
+
 	private MouseHandler mouseHandler;
 	protected OSCAgent oscA;
-	protected ControllerFrame secondView;
+	protected ControllerFrame GUI;
 
 	public MorphOSC(PApplet p_) {
 
 		parent = p_;
-		initsecondView();
+		cp5 = new ControlP5(parent);
 		paramColors = generateParamColors(maxMParams);
 		mlFillColors = generateLayerFills(maxMLayers);
 		mlStrokeColors = generateLayerStrokes(maxMLayers);
@@ -99,38 +101,78 @@ public class MorphOSC implements PConstants {
 		addMouseHandler();
 		//addMorphView();
 		if(useControlFrame){
-			secondView.addControlFrame("GUI2", 500,500);
+			GUI.addControlFrame("2", 500,500);
 		}
 		//oscP5 = new OscP5(this,8001);
 		addOSCAgent();
-		
+		initGUI();
+
 
 	}
 
-	private void initsecondView() {
+	//For Desktop Mode
+	//	private void initGUI() {
+	//
+	//		try {
+	//			locked = parent.loadImage("data/lock_lock_01_small.jpg");
+	//			unlocked = parent.loadImage("data/lock_unlock_01_small.jpg");
+	//		} catch (Exception e) {
+	//			// TODO Implement catch block
+	//			e.printStackTrace();
+	//			System.out.println("Could not load images!");
+	//
+	//		}
+	//		if (IsLocked) {
+	//			lockX = 50;
+	//			lockY = parent.height-locked.height;
+	//		} else {
+	//			lockX = 50;
+	//			lockY = parent.height-unlocked.height;
+	//		}
+	//		// SafeZones for GUI elements
+	//		SafeZone lock = new SafeZone(parent, sZoneList.size(), lockX, lockY,
+	//				(float) locked.width, (float) locked.height); //GUI lock
+	//		lock.setId(sZoneList.size());
+	//		sZoneList.add(lock); 
+	//		sZoneList.size() += 1;
+	//
+	//	}
 
-		try {
-			locked = parent.loadImage("data/lock_lock_01_small.jpg");
-			unlocked = parent.loadImage("data/lock_unlock_01_small.jpg");
-		} catch (Exception e) {
-			// TODO Implement catch block
-			e.printStackTrace();
-			System.out.println("Could not load images!");
 
-		}
-		if (guiIsLocked) {
-			lockX = 50;
-			lockY = parent.height-locked.height;
-		} else {
-			lockX = 50;
-			lockY = parent.height-unlocked.height;
-		}
-		// SafeZones for secondView elements
-		SafeZone lock = new SafeZone(parent, nSafeZones, lockX, lockY,
-				(float) locked.width, (float) locked.height); //secondView lock
-		lock.setId(nSafeZones);
-		sZoneList.add(lock); 
-		nSafeZones += 1;
+	//For Android mode
+	private void initGUI() {
+
+		//		try {
+		//			locked = parent.loadImage("data/lock_lock_01_small.jpg");
+		//			unlocked = parent.loadImage("data/lock_unlock_01_small.jpg");
+		//		} catch (Exception e) {
+		//			// TODO Implement catch block
+		//			e.printStackTrace();
+		//			System.out.println("Could not load images!");
+		//
+		//		}
+		//		if (IsLocked) {
+		//			lockX = 50;
+		//			lockY = parent.height-locked.height;
+		//		} else {
+		//			lockX = 50;
+		//			lockY = parent.height-unlocked.height;
+		//		}
+		//		// SafeZones for GUI elements
+		//		SafeZone lock = new SafeZone(parent, sZoneList.size(), lockX, lockY,
+		//				(float) locked.width, (float) locked.height); //GUI lock
+		//		lock.setId(sZoneList.size());
+		//		sZoneList.add(lock); 
+
+		lock = cp5.addToggle("Lock")
+				.setPosition(100, parent.height-100)
+				.setSize(100,100);
+
+		lock.setId(sZoneList.size());
+		SafeZone szlock = new SafeZone(parent, sZoneList.size(), lock.getPosition().x, lock.getPosition().y,
+				(float) lock.getWidth(), (float) lock.getHeight()); //GUI lock
+		sZoneList.add(szlock); 
+
 
 	}
 
@@ -195,7 +237,7 @@ public class MorphOSC implements PConstants {
 	}
 
 	public void addController(Controller c_) {
-		if (nMParams < maxMParams) {
+		if (nMParams < maxMParams  && c_ instanceof Slider) {
 			Controller c = c_;
 			cList.add(c);
 			Parser pr = new Parser(parent);
@@ -203,15 +245,26 @@ public class MorphOSC implements PConstants {
 			mp.setId(nMParams);
 			mpList.add(mp);
 			nMParams += 1;
-			SafeZone sz = new SafeZone(parent, nSafeZones, c.getPosition().x, 
-					c.getPosition().y-c.getHeight()/4,(float) c.getWidth(), (float) c.getHeight()); //secondView lock
-			sz.setId(nSafeZones);
+			SafeZone sz = new SafeZone(parent, sZoneList.size(), c.getPosition().x, 
+					c.getPosition().y-c.getHeight()/4,(float) c.getWidth(), (float) c.getHeight()); //GUI lock
+			sz.setId(sZoneList.size());
 			sZoneList.add(sz); 
 			//System.out.println("Safe Zone #"+sz.getId()+" added to controller #"+c.getId());
-			nSafeZones += 1;
+
 		} else {
 			System.out.println("Can't add Controller, maximum reached");
 		}
+	}
+
+	public void addAllControllers(ControlP5 cp5In) {
+		List controllerList = cp5In.getAll();
+		for(int i=0;i<controllerList.size();i+=1){
+			if(controllerList.get(i) instanceof Slider){
+				Controller c = (Controller)controllerList.get(i);
+				addController(c);
+			}
+		}
+
 	}
 
 	void addMorphLayer(PVector v_) {
@@ -349,14 +402,14 @@ public class MorphOSC implements PConstants {
 		return new MorphAnchor(-1,new PVector(-1,-1)); //Null MorphAnchor
 
 	}
-	
-	protected void setsecondViewLockStatus(boolean set_){
-		guiIsLocked = set_;
+
+	protected void setGUILockStatus(boolean set_){
+		IsLocked = set_;
 	}
-	
-	protected boolean getsecondViewLockStatus(){
-		return guiIsLocked;
-		
+
+	protected boolean getGUILockStatus(){
+		return IsLocked;
+
 	}
 
 
@@ -367,11 +420,11 @@ public class MorphOSC implements PConstants {
 	}
 
 	public void draw() {
-		displaysecondView();
+		displayGUI();
 		// System.out.println("Draw called");
 	}
 
-	private void displaysecondView() {
+	private void displayGUI() {
 
 		for (int i = 0; i < mlList.size(); i += 1) {
 			MorphLayer ml = mlList.get(i);
@@ -382,18 +435,18 @@ public class MorphOSC implements PConstants {
 			parent.popMatrix();
 		}
 
-		if (guiIsLocked) {
-			parent.image(locked, lockX, lockY, locked.width,
-					locked.width);
-		} else {
-			parent.image(unlocked, lockX, lockY, unlocked.width,
-					unlocked.width);
-		}
+		//		if (IsLocked) {
+		//			parent.image(locked, lockX, lockY, locked.width,
+		//					locked.width);
+		//		} else {
+		//			parent.image(unlocked, lockX, lockY, unlocked.width,
+		//					unlocked.width);
+		//		}
 
 		parent.stroke(255, 200);
 		parent.noFill();
 		parent.rectMode(CORNER);
-		for (int i = 0; i < nSafeZones; i += 1) {
+		for (int i = 0; i < sZoneList.size(); i += 1) {
 			SafeZone sfz = sZoneList.get(i);
 			sfz.display(); // display the safe zones around controllers (MLayers
 			// etc won't be created over SafeZones)
@@ -451,7 +504,7 @@ public class MorphOSC implements PConstants {
 	}
 	}
 
-	
+
 
 	public void keyEvent(KeyEvent e) {
 	}
@@ -487,10 +540,10 @@ public class MorphOSC implements PConstants {
 
 
 	}
-	
+
 	protected void addMouseHandler(){
 		mouseHandler = new MouseHandler(this);
-	
+
 	}
 	protected void setMouseVector(PVector mv_) {
 		mouseVector = mv_;
@@ -502,19 +555,19 @@ public class MorphOSC implements PConstants {
 		return mouseVector;
 
 	}
-	
-//	private void addMorphView(){
-//		secondView = new ControlFrame("GUI", 500,500);		
-//	}
-	
+
+	//	private void addMorphView(){
+	//		GUI = new ControlFrame("", 500,500);		
+	//	}
+
 	private void addOSCAgent(){
-		 oscA = new OSCAgent(this);
-		
+		oscA = new OSCAgent(this);
+
 	}
-	
+
 	protected void relayOSCMessage(OscMessage msg_){
 		oscA.setMessage(msg_);
 		oscA.send();
 	}
-	
+
 }

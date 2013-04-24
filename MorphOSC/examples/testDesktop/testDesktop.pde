@@ -1,7 +1,7 @@
 /*
 Test sketch for Desktop MorphOSC
-
-*/
+ 
+ */
 import net.liamosullivan.morphosc.*;
 import controlP5.*;
 
@@ -22,42 +22,43 @@ void setup() {
   textFont(font, 24);
 
   cp5 = new ControlP5(this);
-    m = new MorphOSC(this);
+  m = new MorphOSC(this);
   //Create some ControlP5 GUI elements...
   s1 = cp5.addSlider("S1")
-  .setId(0)
-    .setPosition(sliderX, sliderY)
-      .setRange(0, 100)
-        ;
+    .setId(0)
+      .setPosition(sliderX, sliderY)
+        .setRange(0, 100)
+          ;
 
   sliderY += 2*s1.getHeight();
 
   s2 = cp5.addSlider("S2")
-  .setId(1)
-    .setPosition(sliderX, sliderY)
-      .setRange(0, 100)
-        ;
+    .setId(1)
+      .setPosition(sliderX, sliderY)
+        .setRange(0, 100)
+          ;
   sliderY += 2*s1.getHeight();
 
   s3 = cp5.addSlider("S3")
-  .setId(2)
-    .setPosition(sliderX, sliderY)
-      .setRange(0, 100)
-        ;
+    .setId(2)
+      .setPosition(sliderX, sliderY)
+        .setRange(0, 100)
+          ;
 
   sliderY += 2*s1.getHeight();
 
   s4 = cp5.addSlider("S4")
-  .setId(3)
-    .setPosition(sliderX, sliderY)
-      .setRange(0, 100)
-        ;
+    .setId(3)
+      .setPosition(sliderX, sliderY)
+        .setRange(0, 100)
+          ;
 
   //Add elements to MorphOSC...  
-  m.addController(s1); //add s1 to MorphOSC
-  m.addController(s2);
-  m.addController(s3);
-  m.addController(s4);
+//  m.addController(s1); //add s1 to MorphOSC
+//  m.addController(s2);
+//  m.addController(s3);
+//  m.addController(s4);
+m.addAllControllers(cp5);
   m.getControllerInfo(); //print the controllers added to MorphOSC only
   m.addMorphLayer(width/2, height/2); //MorphLayer can be added in the sketch or via interaction at runtime
 }

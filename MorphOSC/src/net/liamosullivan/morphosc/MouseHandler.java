@@ -30,15 +30,15 @@ public class MouseHandler {
 		setMouseVector(v);
 
 		//////////////////////////////////////////////////////////////////GUI Locked
-		if (parent.guiIsLocked) { 
+		if (parent.IsLocked) { 
 			// Gestures cause interpolated output when GUI is locked
 			boolean keepChecking = true;
-			for (int i = 0; i < parent.nSafeZones && keepChecking; i += 1) { 
+			for (int i = 0; i < parent.sZoneList.size() && keepChecking; i += 1) { 
 				SafeZone sz = parent.sZoneList.get(i);
 				if (sz.select(v)) {
 					//					System.out.println("Safe Zone " + sz.getId() + " selected");
 					if(sz.getId()==0){ //safe 0 is GUI lock toggle
-						parent.guiIsLocked=!parent.guiIsLocked;
+						parent.IsLocked=!parent.IsLocked;
 					}
 					keepChecking = false;
 
@@ -73,16 +73,16 @@ public class MouseHandler {
 
 		}  
 		////////////////////////////////////////////////////////////////// GUI Unlocked
-		else if (!parent.guiIsLocked) {
+		else if (!parent.IsLocked) {
 			boolean keepChecking = true;
 			// Check if over a SafeZone (GUI elements which exist in MorphOSC
 			// object)
-			for (int i = 0; i < parent.nSafeZones && keepChecking; i += 1) { 
+			for (int i = 0; i < parent.sZoneList.size() && keepChecking; i += 1) { 
 				SafeZone sz = parent.sZoneList.get(i);
 				if (sz.select(v)) {
 					//					System.out.println("Safe Zone " + sz.getId() + " selected");
 					if(sz.getId()==0){ //safe 0 is GUI lock toggle
-						parent.guiIsLocked=!parent.guiIsLocked;
+						parent.IsLocked=!parent.IsLocked;
 					}
 					keepChecking = false;
 
@@ -373,7 +373,7 @@ public class MouseHandler {
 	protected void dragged(PVector v_) {
 		PVector v = v_;
 		setMouseVector(v);
-		if (parent.guiIsLocked) {
+		if (parent.IsLocked) {
 			for (int i = parent.nMLayers - 1; i >= 0; i--) { 
 				MorphLayer ml = parent.mlList.get(i);
 				if (ml.select(v)) {
@@ -414,7 +414,7 @@ public class MouseHandler {
 
 			}//end for loop
 		} 
-		else if (!parent.guiIsLocked) {
+		else if (!parent.IsLocked) {
 			if (parent.layerIsMoving) {
 				MorphLayer tlMove = parent.mlList.get(parent.movingLayer);
 				tlMove.move(v);

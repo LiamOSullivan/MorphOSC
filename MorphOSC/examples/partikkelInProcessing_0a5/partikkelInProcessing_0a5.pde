@@ -31,8 +31,6 @@ int interpStartTime;
 
 float xFadeTime = 2.0; //preset interpolation fade time
 
-
-
 void setup() {
   size(1080, 670);
   frameRate(30);
@@ -42,46 +40,10 @@ void setup() {
   //Android Mode (comment out either)
   //cs = new Csoundo(this, super.getApplicationContext());
   //Java Mode
-  cs = new Csoundo(this, "partikkelInProcessing_0a4.csd");
+  cs = new Csoundo(this, "partikkelInProcessing_0a5.csd");
   //cs = new Csoundo(this, "partikkelFLTK.csd");
   cs.run();
-  // Partikkel parameters/////////////////////////////////////////////////////////////////////////////////////////////
-  //GfFmIndx : Frequency modulation index, modulating the grain rate.
-  //GfFmFqRat : Frequency modulation frequency, as percentage of the grain rate.
-  //GrDist : Grain distribution.
-  //GrTransp : Transposition (pitch) scaling of all grains.
-  //FqCenter : The end frequency for pitch sweeps of grains.
-  //SweepShap : Shape of the curve for transposition sweeps
-  //FmIndex : FM Modulation index, modulating the pitch of source waveforms.
-  //FmFreq : Frequency of the FM oscillator, modulating the pitch of source waveforms. 
-  //If Frequency is set to zero, audio feedback is used instead of an oscillator for the FM modulator signal.
-  //GrDur : Grain duration, in percent of 1/grainrate, so e.g. a value of 400 gives a grain overlap of 4.
-  //GrAttack: Balance between attack time and decay time for grain enveloping, 0 = zero attack time and full 
-  //decay time.
-  //GrShape: GrShape: Amount of grain (attack and decay) enveloping. This can also be described as balance 
-  //between enveloped time(attack+decay) and sustain level time, 0 = no time at sustain level.
-  //  TimePos : Time position offset, reading of source grain waveforms start from this position in the waveform. Scaled as percentage of the waveform length. For example, setting this to 50 will let new grains start reading from halfway through the source waveform. For single cycle waveforms it would make sense to call this "phase", but for sampled sounds it makes more sens to name it "time position".
-  //timLfoFq : LFO frequency, modulating the time pointer offset (see TimPosOff).
-  //timLfoAm : LFO amount, modulating the time pointer offset (see TimPosOff).
 
-  //  GrainAmp : The master amplitude.
-  //GainMsk1 : Start (loop start) index for reading gain mask values. Gain masks specify gain per grain.
-  //GainMsk1 : End (loop end) index for reading gain mask values.
-  //RandMask : Amount of random masking (muting) of grains.
-  //ChMask1 : Start (loop start) index for reading channel mask values. Channel masks specify which audio output grains are routed to, per grain.
-  //ChMask2 : End (loop end) index for reading channel mask values.
-  //width : Stereo spread of partikkel audio outputs 1 and 2.
-  //displDly2 : Delay time for partikkel audio output 2, in percent of 1/grainrate.
-  //chorusAmt : Chorus effect send amount for partikkel audio output 3.
-  //reverbAmt : Reverb effect send amount for partikkel audio output 4.
-  //chRewrit : Rewrite LFO speed. This controls a continuous rewriting of the channel masks ftable, similar to a panning LFO. Since some partikkel audio outs are used for stereo positioning and other outputs are used for effect sends, this control enables a sort of sonic animation. When setting the control to zero, the original contents of the channel mask table is restored.
-  //TrnAmp : Amplitude for trainlets. This is implemented so that increasing trainlet amplitude automaticcally decreases amplitude for waveform grains. The decreasing of amp for waveform grains is written as values to the wave mix ftable at the index currently selected in the gui control WavMaskEdit.
-  //TrnCps : The fundamental frequency of the trainlets.
-  //TrnPart : Number of harmonics for the trainlets.
-  //TrnChrom : Trainlet chroma. Harmonic balance of the trainlets.
-  //nFmIndx : Frequency modulation index for a noise modulator signal added to the FM modulator (FmIndex,FmFreq controls) modulating the pitch of source waveforms.
-  //nFmDist : Random distribution for the noise FM modulator signal. See csound opcode rnd31. Gui values are scaled * 0.01.
-  //nFmFreq : Lowpass filter frequency for the noise FM modulator signal.
   // Set default values in Csound chn bus memory
   cs.setChn("On", 0.0);
   cs.setChn("GrFreq", 14);
@@ -131,8 +93,8 @@ void setup() {
   cs.setChn("PresetExclTrainCps", 0.0);
 
   int hPad = 5, vPad = 20, borderPad = hPad*2;
-  int sliderW = width/16-hPad, sliderH= height/4;
-  int sliderX = width/16+hPad;
+  int sliderW = width/(2*16)-hPad, sliderH= height/4;
+  int sliderX = width/(2*16)+hPad;
 
   // Top buttons...
   int buttonW = 60, buttonH = 20;
@@ -429,4 +391,42 @@ float expScale(float in_, float min_, float max_) {
   }
   return ans;
 }
+
+// Partikkel parameters/////////////////////////////////////////////////////////////////////////////////////////////
+//GfFmIndx : Frequency modulation index, modulating the grain rate.
+//GfFmFqRat : Frequency modulation frequency, as percentage of the grain rate.
+//GrDist : Grain distribution.
+//GrTransp : Transposition (pitch) scaling of all grains.
+//FqCenter : The end frequency for pitch sweeps of grains.
+//SweepShap : Shape of the curve for transposition sweeps
+//FmIndex : FM Modulation index, modulating the pitch of source waveforms.
+//FmFreq : Frequency of the FM oscillator, modulating the pitch of source waveforms. 
+//If Frequency is set to zero, audio feedback is used instead of an oscillator for the FM modulator signal.
+//GrDur : Grain duration, in percent of 1/grainrate, so e.g. a value of 400 gives a grain overlap of 4.
+//GrAttack: Balance between attack time and decay time for grain enveloping, 0 = zero attack time and full 
+//decay time.
+//GrShape: GrShape: Amount of grain (attack and decay) enveloping. This can also be described as balance 
+//between enveloped time(attack+decay) and sustain level time, 0 = no time at sustain level.
+//  TimePos : Time position offset, reading of source grain waveforms start from this position in the waveform. Scaled as percentage of the waveform length. For example, setting this to 50 will let new grains start reading from halfway through the source waveform. For single cycle waveforms it would make sense to call this "phase", but for sampled sounds it makes more sens to name it "time position".
+//timLfoFq : LFO frequency, modulating the time pointer offset (see TimPosOff).
+//timLfoAm : LFO amount, modulating the time pointer offset (see TimPosOff).
+
+//  GrainAmp : The master amplitude.
+//GainMsk1 : Start (loop start) index for reading gain mask values. Gain masks specify gain per grain.
+//GainMsk1 : End (loop end) index for reading gain mask values.
+//RandMask : Amount of random masking (muting) of grains.
+//ChMask1 : Start (loop start) index for reading channel mask values. Channel masks specify which audio output grains are routed to, per grain.
+//ChMask2 : End (loop end) index for reading channel mask values.
+//width : Stereo spread of partikkel audio outputs 1 and 2.
+//displDly2 : Delay time for partikkel audio output 2, in percent of 1/grainrate.
+//chorusAmt : Chorus effect send amount for partikkel audio output 3.
+//reverbAmt : Reverb effect send amount for partikkel audio output 4.
+//chRewrit : Rewrite LFO speed. This controls a continuous rewriting of the channel masks ftable, similar to a panning LFO. Since some partikkel audio outs are used for stereo positioning and other outputs are used for effect sends, this control enables a sort of sonic animation. When setting the control to zero, the original contents of the channel mask table is restored.
+//TrnAmp : Amplitude for trainlets. This is implemented so that increasing trainlet amplitude automaticcally decreases amplitude for waveform grains. The decreasing of amp for waveform grains is written as values to the wave mix ftable at the index currently selected in the gui control WavMaskEdit.
+//TrnCps : The fundamental frequency of the trainlets.
+//TrnPart : Number of harmonics for the trainlets.
+//TrnChrom : Trainlet chroma. Harmonic balance of the trainlets.
+//nFmIndx : Frequency modulation index for a noise modulator signal added to the FM modulator (FmIndex,FmFreq controls) modulating the pitch of source waveforms.
+//nFmDist : Random distribution for the noise FM modulator signal. See csound opcode rnd31. Gui values are scaled * 0.01.
+//nFmFreq : Lowpass filter frequency for the noise FM modulator signal.
 
