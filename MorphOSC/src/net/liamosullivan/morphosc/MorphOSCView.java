@@ -33,7 +33,7 @@ public class MorphOSCView {
 	parent.sZoneList.add(szlock); 
 	}
 	
-	protected void displayGUI() {
+	protected void draw() {
 		//Display layers
 		
 		for (int i = 0; i < parent.mlList.size(); i += 1) {

@@ -76,7 +76,7 @@ public class MorphOSC implements PConstants {
 
 	boolean addAnchorsToAllLayers = false;
 
-	private MouseHandler mouseHandler;
+	private MorphOSCController mouseHandler;
 	protected OSCAgent oscA;
 	//protected ControllerFrame GUI;
 
@@ -342,7 +342,7 @@ public class MorphOSC implements PConstants {
 
 	public void draw() {
 		gui.showMParameters();
-		gui.displayGUI();
+		gui.draw();
 		// System.out.println("Draw called");
 	}
 
@@ -409,16 +409,16 @@ public class MorphOSC implements PConstants {
 	}
 
 	protected void addMouseHandler(){
-		mouseHandler = new MouseHandler(this);
+		mouseHandler = new MorphOSCController(this);
 
 	}
+	
 	protected void setMouseVector(PVector mv_) {
-		mouseVector = mv_;
+	mouseVector = mv_;
 
 	}
 
 	protected PVector getMouseVector() {
-
 		return mouseVector;
 
 	}

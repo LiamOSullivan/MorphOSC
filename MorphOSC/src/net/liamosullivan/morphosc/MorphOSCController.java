@@ -14,13 +14,13 @@ import processing.event.MouseEvent;
 import oscP5.*;
 import netP5.*;
 
-public class MouseHandler {
+public class MorphOSCController {
 
 	MorphOSC parent;
 	PVector mouseVector;
 
 
-	protected MouseHandler(MorphOSC parent_) {
+	protected MorphOSCController(MorphOSC parent_) {
 		parent = parent_;
 	}
 
@@ -480,13 +480,13 @@ public class MouseHandler {
 	}
 
 	void setMouseVector(PVector mv_) {
-		mouseVector = mv_;
+		parent.mouseVector = mv_;
 
 	}
 
 	PVector getMouseVector() {
 
-		return mouseVector;
+		return parent.mouseVector;
 
 	}
 
