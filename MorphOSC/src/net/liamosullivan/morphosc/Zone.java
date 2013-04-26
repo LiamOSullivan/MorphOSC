@@ -20,12 +20,12 @@ public class Zone {
 
 		this.parent=parent_;
 		this.width=w_;
-		this.height=2*h_;
+		this.height=h_;
 		this.size = new PVector(width, height);
 //		halfWidth=width/2;
 //		halfHeight=height/2;
 		this.x=x_;
-		this.y=y_-h_/4; //correct for drawing controls at corners
+		this.y=y_; //correct for drawing controls at corners
 		this.pos = new PVector(x, y);
 
 	}
@@ -34,13 +34,13 @@ public class Zone {
 		this.parent=parent_;
 		this.size = new PVector();
 		this.size.x= size_.x;
-		this.size.y= 2*size_.y;
+		this.size.y= size_.y;
 		this.width=size.x;
 		this.height=size.y;
 //		halfWidth=width;
 //		halfHeight=height;
 		this.x=pos_.x;
-		this.y=pos_.y-size.y/4; //correct for drawing controls at corners
+		this.y=pos_.y; 
 		this.pos=pos_;
 
 	}

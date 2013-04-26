@@ -7,26 +7,19 @@ import processing.core.*;
 public class MorphLayer extends InteractiveLayer
 {
 	PApplet parentApplet;
-	private ArrayList<MorphParameter> mpList = new ArrayList();
+	protected ArrayList<MorphParameter> mpList = new ArrayList();
 	//private int nMPs = 0; //number of MPs currently in layer
-	private ArrayList<MorphAnchor> maList = new ArrayList();
+	protected ArrayList<MorphAnchor> maList = new ArrayList();
 	//int nMAs = 0; //number of MAs currently in layer
 	//List<Float> distances = new ArrayList();
 
-	PFont font;
-	PFont boldFont;
-	int textH = 22;
-	int ptSize = 10;
-	//float PSize = 40.0F;
-	int mpSwatchSize;
-	int anchorTextSize = 20;
-	//boolean movePoint = false;
+
 	boolean removeMPWithLastMA = true; //does what it says
 
-	MorphLayer(PApplet p_, int id_, int x_, int y_, int w_, int h_, int fC_, int sC_, int dispW_, int dispH_)
+	MorphLayer(PApplet p_, int id_, int x_, int y_, int w_, int h_, int dispW_, int dispH_)
 	{
-		super(p_, id_, x_, y_, w_, h_, fC_, sC_, dispW_, dispH_);
-		mpSwatchSize= barH-10;
+		super(p_, id_, x_, y_, w_, h_, dispW_, dispH_);
+		
 	}
 
 	public void addMorphParameter(MorphParameter mp_)
@@ -195,37 +188,5 @@ public class MorphLayer extends InteractiveLayer
 
 
 	}
-
-	@Override
-	public void displayContents()
-	{
-		//show MorphParameters
-		parent.fill(255,255,255,200);
-		parent.noStroke();
-		for(int i =0;i<mpList.size();i+=1){
-			MorphParameter mp = mpList.get(i);
-			parent.rect((i+1)*barH-halfWidth,-halfHeight + 0.5F * barH,  mpSwatchSize, mpSwatchSize);
-			parent.textSize(20);
-			parent.text(""+mp.getId(), (i+1)*barH-halfWidth,-halfHeight); //place MP swatches on top bar
-
-		}
-		parent.noFill();
-		parent.textSize(anchorTextSize);
-		parent.ellipseMode(CENTER);
-		//show anchors
-		for(int i =0;i<maList.size();i+=1){
-			MorphAnchor ma = maList.get(i);
-			parent.fill(255,255,255,200);
-			parent.ellipse(ma.getPosition().x, ma.getPosition().y, 10, 10); //draw a circle at the anchor point
-			//parent.text(""+ma.getPosition().x + ma.getPosition().y, ma.getPosition().x, ma.getPosition().y); 
-			for(int j=0;j<ma.valueList.size();j+=1){ //TODO: change to method getValueList
-				parent.stroke(255,255,255,200);
-				//parent.text("*", ma.getPosition().x, ma.getPosition().y+(i*anchorTextSize)); 
-				parent.text(ma.getMPValueByIndex(j), ma.getPosition().x, ma.getPosition().y+(j*anchorTextSize)); 
-				//TODO: get rid of valueList and just use MPs, as there is an mpList for each anchor 
-				//that can hold 'current' value
-			}
-
-		}
-	}
+	
 }

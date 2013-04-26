@@ -13,21 +13,18 @@ public class Parser
   ArrayList mpList = new ArrayList();
   int nMPs = 0;
   int maxNPs = 32;
-  int nColors = this.maxNPs;
-
+  
   Parser(PApplet parent_)
   {
     this.parent = parent_;
   }
 
-  protected MorphParameter parseController(Controller cin_, int color_) {
+  protected MorphParameter parseController(Controller cin_) {
     Controller c = cin_;
-    int color = color_;
     MorphParameter mp = 
       new MorphParameter(this.parent, c.getId(), c.getName()); 
     mp.setSize(new PVector(c.getWidth(), c.getHeight()));
     mp.setPosition(c.getPosition());
-    mp.setColor(color);
     mp.addValueZone();
     mp.addSelectZone();
     mp.setMax(c.getMax());

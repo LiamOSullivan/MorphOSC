@@ -28,12 +28,14 @@ void setup() {
     .setId(0)
       .setPosition(sliderX, sliderY)
         .setRange(0, 100)
-          ;
+        .setHeight(20);
+          
 
   sliderY += 2*s1.getHeight();
 
   s2 = cp5.addSlider("S2")
     .setId(1)
+    .setHeight(20)
       .setPosition(sliderX, sliderY)
         .setRange(0, 100)
           ;
@@ -41,6 +43,7 @@ void setup() {
 
   s3 = cp5.addSlider("S3")
     .setId(2)
+    .setHeight(20)
       .setPosition(sliderX, sliderY)
         .setRange(0, 100)
           ;
@@ -49,6 +52,7 @@ void setup() {
 
   s4 = cp5.addSlider("S4")
     .setId(3)
+    .setHeight(20)
       .setPosition(sliderX, sliderY)
         .setRange(0, 100)
           ;
@@ -80,6 +84,11 @@ void controlEvent(ControlEvent e) {
     //println("Controller ID "+e.getController().getId());
   }
   m.controlEvent(e);
+}
+
+//Callback method for in-sketch control
+void morphOSCEvent(){
+  
 }
 
 void showFramerate() {

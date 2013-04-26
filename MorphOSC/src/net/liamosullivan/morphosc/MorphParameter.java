@@ -136,16 +136,4 @@ public class MorphParameter
 	}
 
 
-	void display(){
-		//Display a colour swatch next to controller at SelectZone 
-		parent.rectMode(0); //0 for CORNER, 3 for CENTER
-		parent.noStroke();
-		parent.fill(this.c);
-		slz.display();
-		parent.stroke(this.c);
-		parent.noFill();
-		vlz.display();
-		parent.rectMode(3); //0 for CORNER, 3 for CENTER
-	}
-
 }

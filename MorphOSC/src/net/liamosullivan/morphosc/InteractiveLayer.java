@@ -23,10 +23,6 @@ implements PConstants
 	float yOffset;
 	float xRelative;
 	float yRelative;
-	int fColour;
-	int sColour;
-	byte fOpacity;
-	byte sOpacity;
 	int dispWidth;
 	int dispHeight;
 	int noOfHandles = 4;
@@ -46,7 +42,7 @@ implements PConstants
 	private final float MIN_HEIGHT =50.0F;
 
 
-	InteractiveLayer(PApplet p_, int id_, int x_, int y_, int width_, int height_, int fC_, int sC_, int dispW_, int dispH_)
+	InteractiveLayer(PApplet p_, int id_, int x_, int y_, int width_, int height_, int dispW_, int dispH_)
 	{
 		parent = p_;
 		id = id_;
@@ -57,9 +53,6 @@ implements PConstants
 		lHeight = height_;
 		halfWidth = (lWidth / 2);
 		halfHeight = (lHeight / 2);
-
-		fColour = fC_;
-		sColour = sC_;
 		dispWidth = dispW_;
 		dispHeight = dispH_;
 		createHandles();
@@ -165,6 +158,7 @@ implements PConstants
 
 	void resize(PVector v_)
 	{
+		//TODO: better doubled-sided resizing, constrain to onscreen rather than PApplet size.
 		PVector v=v_;
 		//boolean hasScaled=false;
 		float originalW = lWidth;
@@ -178,15 +172,14 @@ implements PConstants
 		else{
 			lHeight = PApplet.constrain(PApplet.abs(2 * (ly - v.y)), MIN_HEIGHT, parent.height);	
 		}
-		halfWidth = ((float)(lWidth / 2.0D));
-		halfHeight = ((float)(lHeight / 2.0D));
+		halfWidth = ((float)(lWidth / 2.0F));
+		halfHeight = ((float)(lHeight / 2.0F));
 		createHandles();
-		//if (hasScaled){
 		float xScale = lWidth/originalW;
 		float yScale = lHeight/originalH;
 		PVector scaler = new PVector (xScale, yScale);
 		resizeContents(scaler);
-		//}
+		
 	}
 
 	void rotate()
@@ -202,54 +195,7 @@ implements PConstants
 		yRelative = (parent.mouseY - ly);
 	}
 
-	public void display()
-	{
-		//System.out.println("Display Layer called");
-		parent.colorMode(HSB, 255.0F);
-		parent.strokeWeight(3.0F);
-		parent.textAlign(LEFT);
-		parent.textFont(font, layerTextSize);
-		parent.fill(fColour);
-		parent.text(id, halfWidth-layerTextSize, halfHeight-layerTextSize/2);
-		parent.fill(fColour);
 
-		if (isOverLayerBar) {
-			parent.stroke(sColour);
-		}
-		else {
-			parent.noStroke();
-		}
-
-		if (isOverHandle) {
-			//System.out.println("Showing Handle");
-			parent.stroke(sColour);
-			parent.textFont(font, dialogTextSize);
-			parent.fill(fColour);
-			parent.ellipseMode(parent.CENTER);
-			parent.ellipse(handleX[handleId], handleY[handleId], handleSize, handleSize);
-			if (verboseDisplay) {
-				parent.fill(255);
-				parent.textAlign(3);
-				parent.text("w: " + lWidth, lx, handleY[0]);
-				parent.text("h: " + lHeight, handleX[0], ly);
-				parent.text("(" + lx + ", " + ly + ")", lx, ly);
-			}
-		}
-		if ((isDraggingOnLayer) && 
-				(verboseDisplay)) {
-			parent.fill(255);
-			parent.textSize(dialogTextSize);
-			parent.textAlign(3);
-			parent.text(id + ": (" + xRelative + ", " + yRelative + ")", parent.mouseX, parent.mouseY + 12 * id);
-			parent.fill(fColour);
-		}
-		parent.rect(0, 0, lWidth, lHeight);    //draw main layer
-
-		parent.fill(fColour);
-		parent.rect(0, (float)(-halfHeight - 0.5D * barH), lWidth, barH); //draw top window bar
-		if (displayContents)
-			displayContents();
-	}
 
 	void displayContents(){
 		//placeholder- implemented in subclass

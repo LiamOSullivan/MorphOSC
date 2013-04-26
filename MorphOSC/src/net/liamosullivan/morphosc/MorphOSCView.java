@@ -5,6 +5,9 @@ import controlP5.*;
 import java.awt.Frame;
 import java.awt.BorderLayout;
 import processing.core.PConstants;
+import java.util.*;
+
+
 
 public class MorphOSCView {
 	PApplet grandparent;
@@ -12,6 +15,27 @@ public class MorphOSCView {
 	ControllerFrame cf;
 	ControlP5 cp5View;
 	Toggle lockToggle;
+	boolean verboseMode = true;
+	boolean displayLayerContents =true;
+	//MorphLayer properties
+	float mlw, mlh;
+	int barH = 20;
+	PFont font;
+	PFont boldFont;
+	int textH = 22;
+	int iPtSize = 10;
+	int mpSwatchSize =20;
+	int anchorTextSize = 20;
+	int layerTextSize = 40;
+	int dialogTextSize = 30;
+	//MorphParameter properties
+	int baseFillSat = 150, baseFillBright =150;
+	int baseStrokeSat = 200, baseStrokeBright =200;
+	byte [] mpHues; 
+	byte[] mlHues; 
+	int mpOpac = 200, mlFillOpac = 100, mlStrokeOpac = 150; 
+	int mlStrokeWeight = 3, mpvStrokeWeight =2;
+	int mlSwatchW =5;
 
 	public MorphOSCView(PApplet grandparent_, MorphOSC parent_) {
 
@@ -19,92 +43,222 @@ public class MorphOSCView {
 		grandparent = grandparent_;
 		parent = parent_;
 		addControlP5GUI();
-
+		mpHues = new byte[parent.maxMParams];
+		mlHues = new byte[parent.maxMLayers];
+		mpHues= generateHues(parent.maxMParams);
+		mpHues = shuffle(mpHues);
+		mlHues = generateHues(parent.maxMLayers);
+		mlHues = shuffle(mlHues);
+		grandparent.colorMode(PApplet.HSB, 255.0F);
+		grandparent.rectMode(PApplet.CENTER);
+		grandparent.ellipseMode(PApplet.CENTER);
+		font = grandparent.createFont("LucidaConsole-48.vlw", 24);
 	}
-	
+	//Method for initialising the MorphOSC GUI elements
 	private void addControlP5GUI(){
-	cp5View = new ControlP5(grandparent);
-	lockToggle = cp5View.addToggle("Lock")
-			.setPosition(100, grandparent.height-100)
-			.setSize(25,25);
-	lockToggle.setId(parent.sZoneList.size());
-	SafeZone szlock = new SafeZone(grandparent, parent.sZoneList.size(), lockToggle.getPosition().x, lockToggle.getPosition().y,
-			(float) lockToggle.getWidth(), (float) lockToggle.getHeight()); //GUI lock
-	parent.sZoneList.add(szlock); 
+		cp5View = new ControlP5(grandparent);
+		lockToggle = cp5View.addToggle("Lock")
+				.setPosition(100, grandparent.height-100)
+				.setSize(25,25);
+		lockToggle.setId(parent.sZoneList.size());
+		SafeZone szlock = new SafeZone(grandparent, parent.sZoneList.size(), lockToggle.getPosition().x, lockToggle.getPosition().y,
+				(float) lockToggle.getWidth(), (float) lockToggle.getHeight()); //GUI lock
+		parent.sZoneList.add(szlock); 
 	}
-	
+
+	private byte[] generateHues(int max_) {
+		int max = max_;
+		byte hueStep = (byte)PApplet.floor(255 / (max));
+		System.out.println("Hue Step is " +hueStep);
+		byte [] hues = new byte[max];
+		for (int i = 0; i < max; i+=1) {
+			hues[i] = (byte)(hueStep*i); //gives larger hue changes for low numbers of params, then wraps around
+			if(hues[i]<0){
+				hues[i]+=128;
+			}
+			System.out.println("Hue #" + i + ": " + hues[i]);
+			//grandparent.cp5.getController().setColor(hues[i]);
+		}
+		return hues;
+	}
+
+	//	private int[] generateLayerFills(int max_) {
+	//		// ***TO DO: fix color gen for HSB space.
+	//		int max = max_;
+	//		int baseHue = 255 / max;
+	//		System.out.println("Base Layer Fill Hue is " + baseHue);
+	//		int[] fColors = new int[max];
+	//		for (int i = 0; i < max; i++) {
+	//			fColors[i] = grandparent.color(baseHue/2, baseSat, baseBright,
+	//					mlFillOpac);
+	//			//System.out.println("fColours" + i + ": " + fColors[i]);
+	//		}
+	//
+	//		return fColors;
+	//	}
+	//
+	//	private int[] generateLayerStrokes(int max_) {
+	//		int max = max_;
+	//		int baseHue = 255 / max;
+	//		int baseBright = 200;
+	//		int baseSat = 150;
+	//		int[] sColors = new int[max];
+	//		for (int i = 0; i < max; i++) {
+	//			sColors[i] = grandparent.color(baseHue * (i + 1), baseSat * 2,
+	//					baseBright, mlStrokeOpac);
+	//			//System.out.println("sColours" + i + ": " + paramColors[i]);
+	//		}
+	//
+	//		return sColors;
+	//	}
+
 	protected void draw() {
-		//Display layers
-		
+		//draw layers
 		for (int i = 0; i < parent.mlList.size(); i += 1) {
 			MorphLayer ml = parent.mlList.get(i);
 			//System.out.println("Layer position: " + ml.getPosition());
 			grandparent.pushMatrix();
 			grandparent.translate(ml.getPosition().x, ml.getPosition().y);
-			ml.display();
+			drawMorphLayer(ml);
 			grandparent.popMatrix();
 		}
+		//draw MPs
+		for(int i=0;i<parent.mpList.size();i+=1){
+			drawMPSwatch(parent.mpList.get(i));  //swatches (select zones)
+			drawMPValue(parent.mpList.get(i));	 //value (value zones)
+		}
 
-		//		if (IsLocked) {
-		//			parent.image(locked, lockX, lockY, locked.width,
-		//					locked.width);
-		//		} else {
-		//			parent.image(unlocked, lockX, lockY, unlocked.width,
-		//					unlocked.width);
-		//		}
-
+		if(parent.isDraggingMParameter){
+			drawDraggingMP();
+		}
+		else if(parent.isDraggingMPValue){
+			drawDraggingMPV();
+		}
 		
-		//display safe zone borders
-		grandparent.stroke(255, 200);
-		grandparent.noFill();
-		grandparent.rectMode(PApplet.CORNER);
-		for (int i = 0; i < parent.sZoneList.size(); i += 1) {
-			SafeZone sfz = parent.sZoneList.get(i);
-			sfz.display(); // display the safe zones around controllers (MLayers
-			// etc won't be created over SafeZones)
+		
 
-		}
+	}
+	//show MorphParameters on Layer
+	// Image for lock status (deprecated)
+	//if (IsLocked) {
+	//			parent.image(locked, lockX, lockY, locked.width,
+	//					locked.width);
+	//		} else {
+	//			parent.image(unlocked, lockX, lockY, unlocked.width,
+	//					unlocked.width);
+	//		}
+
+
+	// draw borders for controllers added to MorphOSC
+	//			grandparent.stroke(255, 200);
+	//			grandparent.strokeWeight(4);
+	//			grandparent.noFill();
+	//			grandparent.rectMode(PApplet.CORNER);
+	//			for (int i = 0; i < parent.cList.size(); i += 1) {
+	//				Controller c = parent.cList.get(i);
+	//				grandparent.rect(c.getPosition().x,c.getPosition().y,c.getWidth(),c.getHeight());
+	//
+	//			}
+	//			//draw dragged MorphParameter
+	//			grandparent.noStroke();
+	//			grandparent.rectMode(PApplet.CENTER);
+	//			if (parent.isDraggingMParameter) {
+	//				MorphParameter mpDrag = parent.mpList.get(parent.dragMParamID);
+	//				PVector szSize = mpDrag.getSelectZone().getSize();
+	//				PVector mV = parent.getMouseVector();
+	//				grandparent.fill(getStrokeByID(mpDrag.getId()));
+	//				grandparent.rect(mV.x, mV.y, szSize.x, szSize.y); // show rect being
+	//				// dragged with MP
+	//				// color
+	//			}
+	//			//draw dragged MorphParameter value
+	//			if (parent.isDraggingMPValue) {
+	//				MorphParameter mpDrag = parent.mpList.get(parent.draggingMPValue);
+	//				PVector vzSize = mpDrag.getValueZone().getSize();
+	//				PVector mV = parent.getMouseVector();
+	//				grandparent.noFill();
+	//				grandparent.stroke(getStrokeByID(mpDrag.getId()));
+	//				grandparent.rect(mV.x, mV.y, vzSize.x, vzSize.y); // show rect being
+	//				// dragged with MP
+	//				// color stroke
+	//			}
+	//			grandparent.rectMode(PApplet.CORNER);
+	//		if(verboseMode){
+	//				showMParameters();			
+	//			}
+	//
+	//		}
+
+	//draw MorphParameter swatch 
+	void drawMPSwatch(MorphParameter p_){
+		//Display a colour swatch next to controller at SelectZone 
+		//grandparent.rectMode(PApplet.CORNER); 
+		grandparent.pushStyle();
+		grandparent.rectMode(PApplet.CORNER);
 		grandparent.noStroke();
-		grandparent.rectMode(PApplet.CENTER);
+		//grandparent.fill(255);
+		grandparent.fill(mpHues[p_.getId()], baseStrokeSat, baseStrokeBright, mpOpac);
+		grandparent.rect(p_.getPosition().x-20, p_.getPosition().y, p_.getSize().y, p_.getSize().y);
+		grandparent.popStyle();
+		//slz.display();
+		//grandparent.stroke(getStrokeByID(p_.getId()));
+		//grandparent.noFill();
+		//vlz.display();
+		//grandparent.rectMode(PApplet.CENTER); //0 for CORNER, 3 for CENTER
+	}
+	void drawMPValue(MorphParameter p_){
 
-		if (parent.isDraggingMParameter) {
-			MorphParameter mpDrag = parent.mpList.get(parent.dragMParamID);
-			PVector szSize = mpDrag.getSelectZone().getSize();
-			PVector mV = parent.getMouseVector();
-			grandparent.fill(mpDrag.getColor());
-			grandparent.rect(mV.x, mV.y, szSize.x, szSize.y); // show rect being
-			// dragged with MP
-			// color
-		}
-		if (parent.isDraggingMPValue) {
-			MorphParameter mpDrag = parent.mpList.get(parent.draggingMPValue);
-			PVector vzSize = mpDrag.getValueZone().getSize();
-			PVector mV = parent.getMouseVector();
-			grandparent.noFill();
-			grandparent.stroke(mpDrag.getColor());
-			grandparent.rect(mV.x, mV.y, vzSize.x, vzSize.y); // show rect being
-			// dragged with MP
-			// color stroke
-		}
-
+		grandparent.pushStyle();
 		grandparent.rectMode(PApplet.CORNER);
+		grandparent.strokeWeight(mpvStrokeWeight);
+		grandparent.stroke(mpHues[p_.getId()], baseStrokeSat, baseStrokeBright, mpOpac);
+		grandparent.noFill();
+		//grandparent.fill(mpHues[p_.getId()], baseStrokeSat, baseStrokeBright, mpOpac);
+		grandparent.rect(p_.getValueZone().getPosition().x, p_.getValueZone().getPosition().y
+				, p_.getValueZone().getSize().x, p_.getValueZone().getSize().y);
+
+		grandparent.fill(255,200);
+		grandparent.textSize((p_.getValueZone().getSize().y/2));
+		grandparent.textAlign(PApplet.LEFT);
+		grandparent.text(grandparent.nf(p_.getValueZone().getValue(), 3, 1),
+				p_.getValueZone().getPosition().x+mpvStrokeWeight, 
+				p_.getValueZone().getPosition().y+mpvStrokeWeight+p_.getValueZone().getSize().y/2);
+		grandparent.popStyle();
 
 	}
-	protected void showMParameters() {
-		// parent.noStroke();
-		// parent.rectMode(CORNER);
-		grandparent.rectMode(PApplet.CENTER);
-		for (int i = 0; i < parent.mpList.size(); i++) {
-			MorphParameter mp = (MorphParameter) parent.mpList.get(i);
-			mp.display();
 
-		}
-
-	}
-	
 	//For Desktop Mode
-		//	private void initGUI() {
-		//
+	//	private void initGUI() {
+	//
+	//		try {
+	//			locked = parent.loadImage("data/lock_lock_01_small.jpg");
+	//			unlocked = parent.loadImage("data/lock_unlock_01_small.jpg");
+	//		} catch (Exception e) {
+	//			// TODO Implement catch block
+	//			e.printStackTrace();
+	//			System.out.println("Could not load images!");
+	//
+	//		}
+	//		if (IsLocked) {
+	//			lockX = 50;
+	//			lockY = parent.height-locked.height;
+	//		} else {
+	//			lockX = 50;
+	//			lockY = parent.height-unlocked.height;
+	//		}
+	//		// SafeZones for GUI elements
+	//		SafeZone lock = new SafeZone(parent, sZoneList.size(), lockX, lockY,
+	//				(float) locked.width, (float) locked.height); //GUI lock
+	//		lock.setId(sZoneList.size());
+	//		sZoneList.add(lock); 
+	//		sZoneList.size() += 1;
+	//
+	//	}
+
+
+	//For Android mode
+	protected void initGUI() {
+
 		//		try {
 		//			locked = parent.loadImage("data/lock_lock_01_small.jpg");
 		//			unlocked = parent.loadImage("data/lock_unlock_01_small.jpg");
@@ -126,39 +280,180 @@ public class MorphOSCView {
 		//				(float) locked.width, (float) locked.height); //GUI lock
 		//		lock.setId(sZoneList.size());
 		//		sZoneList.add(lock); 
-		//		sZoneList.size() += 1;
-		//
-		//	}
+	}
 
+	//Interactive layer display method
+	private void drawMorphLayer(MorphLayer ml_){
 
-		//For Android mode
-		protected void initGUI() {
+		//default style- bottom of stack
+		//grandparent.fill(mlHues[ml_.getId()]);
 
-			//		try {
-			//			locked = parent.loadImage("data/lock_lock_01_small.jpg");
-			//			unlocked = parent.loadImage("data/lock_unlock_01_small.jpg");
-			//		} catch (Exception e) {
-			//			// TODO Implement catch block
-			//			e.printStackTrace();
-			//			System.out.println("Could not load images!");
-			//
-			//		}
-			//		if (IsLocked) {
-			//			lockX = 50;
-			//			lockY = parent.height-locked.height;
-			//		} else {
-			//			lockX = 50;
-			//			lockY = parent.height-unlocked.height;
-			//		}
-			//		// SafeZones for GUI elements
-			//		SafeZone lock = new SafeZone(parent, sZoneList.size(), lockX, lockY,
-			//				(float) locked.width, (float) locked.height); //GUI lock
-			//		lock.setId(sZoneList.size());
-			//		sZoneList.add(lock); 
+		//drawLayerBar + main layer
+		grandparent.pushStyle();
+		grandparent.strokeWeight(mlStrokeWeight);
+		if (ml_.isOverLayerBar) {
+			grandparent.stroke(mlHues[ml_.getId()], baseStrokeSat, baseStrokeBright, mlStrokeOpac);
+		}
+		else {
+			grandparent.noStroke();
+		}
+		grandparent.fill(mlHues[ml_.getId()], baseFillSat, baseFillBright, mlFillOpac);
+		grandparent.rect(0, 0, ml_.lWidth, ml_.lHeight);   //main layer
+		grandparent.fill(mlHues[ml_.getId()], baseFillSat, baseFillBright, mlStrokeOpac);
+		grandparent.rect(0, (float)(-ml_.halfHeight - 0.5D * barH), ml_.lWidth, barH); //draw top window bar
+		grandparent.popStyle();
 
-			
-
+		//draw MP swatches on layer bar
+		grandparent.pushStyle();
+		grandparent.noStroke();
+		grandparent.rectMode(PApplet.CENTER);
+		for(int j =0;j< ml_.mpList.size();j+=1){
+			MorphParameter mp =ml_.mpList.get(j);
+			//grandparent.rect((j+1)*barH-ml_.halfWidth,-ml_.halfHeight + 0.5F * barH,  mpSwatchSize, mpSwatchSize);
+			grandparent.fill(mpHues[mp.getId()], baseFillSat, baseStrokeSat, mpOpac);
+			grandparent.rect((j+1)*2*mlSwatchW-ml_.halfWidth,-ml_.halfHeight-barH/2,  mlSwatchW, barH-mlStrokeWeight/2);
+			//grandparent.textSize(barH);
+			//grandparent.text(""+mp.getId(), (j+1)*barH-ml_.halfWidth,-ml_.halfHeight); //place MP swatches on top bar
 
 		}
+		grandparent.noFill();
+		grandparent.textSize(anchorTextSize);
+		grandparent.ellipseMode(grandparent.CENTER);
+		grandparent.popStyle();
+
+		//draw layer ID number
+		grandparent.pushStyle();
+		grandparent.strokeWeight(3.0F);
+		grandparent.textAlign(PApplet.LEFT);
+		grandparent.textFont(font, layerTextSize);
+		grandparent.fill(mlHues[ml_.getId()], baseFillSat, baseFillBright);
+		grandparent.text(ml_.id, ml_.halfWidth-layerTextSize,ml_.halfHeight-ml_.layerTextSize/2);
+		grandparent.popStyle();
+
+		//draw handles (when over)
+		grandparent.pushStyle();
+		if (ml_.isOverHandle) {
+			//System.out.println("Showing Handle");
+			grandparent.stroke(mlHues[ml_.getId()], baseStrokeSat, baseStrokeBright, mlStrokeOpac);
+			grandparent.strokeWeight(mlStrokeWeight);
+			grandparent.textFont(font, dialogTextSize);
+			//grandparent.fill(mlHues[ml_.getId()], baseFillSat, baseFillBright);
+			grandparent.noFill();
+			grandparent.ellipseMode(parent.CENTER);
+			grandparent.ellipse(ml_.handleX[ml_.handleId], ml_.handleY[ml_.handleId], ml_.handleSize, ml_.handleSize);
+			//			if (verboseMode) {
+			//				grandparent.fill(255);
+			//				grandparent.textAlign(3);
+			//				grandparent.text("w: " + ml_.lWidth, ml_.lx, ml_.handleY[0]);
+			//				grandparent.text("h: " + ml_.lHeight, ml_.handleX[0], ml_.ly);
+			//				grandparent.text("(" + ml_.lx + ", " + ml_.ly + ")", ml_.lx, ml_.ly);
+			//			}
+		}
+		grandparent.popStyle();
+
+
+		//draw anchors
+		grandparent.pushStyle();
+		grandparent.fill(mlHues[ml_.getId()], baseFillSat, baseFillBright);
+		grandparent.noStroke();
+		for(int j =0;j<ml_.maList.size();j+=1){		
+			MorphAnchor ma = ml_.maList.get(j);
+			grandparent.ellipse(ma.getPosition().x, ma.getPosition().y, 10, 10); //draw a circle at the anchor point
+			//parent.text(""+ma.getPosition().x + ma.getPosition().y, ma.getPosition().x, ma.getPosition().y); 
+			if (verboseMode) {
+				for(int k=0;k<ma.valueList.size();k+=1){ //TODO: change to method getValueList
+					grandparent.stroke(mlHues[ml_.getId()], baseStrokeSat, baseStrokeBright, mlStrokeOpac);
+					//parent.text("*", ma.getPosition().x, ma.getPosition().y+(i*anchorTextSize)); 
+					grandparent.text(ma.getMPValueByIndex(k), ma.getPosition().x, ma.getPosition().y+(k*anchorTextSize)); 
+					//TODO: get rid of valueList and just use MPs, as there is anml.mpList for each anchor 
+					//that can hold 'current' value
+				}
+			}
+
+		}
+		grandparent.popStyle();
+
+
+
+
+	}
+
+	///////////////////////////////////////////////////////////////////////////// objects being dragged
+
+	protected void drawInterpPoint(PVector mv_){
+		//draw interpolation point
+		grandparent.pushStyle();
+		grandparent.fill(255,255,255,150);
+		grandparent.noStroke();
+		//		grandparent.textSize(dialogTextSize);
+		//		grandparent.textAlign(3);
+		//		
+		//grandparent.fill(mlHues[ml_.getId()]);
+		grandparent.ellipse(mv_.x,mv_.y, iPtSize, iPtSize);
+		grandparent.popStyle();
+
+	}
+
+	protected void drawDraggingMP(){
+		grandparent.pushStyle();
+		grandparent.noStroke();
+		grandparent.rectMode(PApplet.CENTER);
+		MorphParameter mpDrag = parent.mpList.get(parent.dragMParamID);
+		PVector szSize = mpDrag.getSelectZone().getSize();
+		PVector mV = parent.getMouseVector();
+		grandparent.fill(mpHues[mpDrag.getId()], baseFillSat, baseStrokeSat);
+		grandparent.rect(mV.x, mV.y, szSize.x, szSize.y); // show rect being dragged
+		grandparent.popStyle();
+	}
+
+	void drawDraggingMPV(){
+		grandparent.pushStyle();
+		grandparent.noStroke();
+		grandparent.rectMode(PApplet.CENTER);
+		MorphParameter mpVDrag = parent.mpList.get(parent.dragMParamID);
+		PVector szSize = mpVDrag.getValueZone().getSize();
+		PVector mV = parent.getMouseVector();
+		grandparent.fill(mpHues[mpVDrag.getId()], baseFillSat, baseStrokeSat);
+		grandparent.rect(mV.x, mV.y, szSize.x, szSize.y); // show rect being dragged
+		grandparent.popStyle();
+
+	}
+	////////////////////////////////////////////////////////////////////////////////////////getters and setters
+	int getFillByID(int id_){
+		return 0;
+	}
+
+	void setFillByID(int id_){
+
+	}
+
+	int getStrokeByID(int id_){
+		return 0;
+	}
+
+	void setStrokeByID(int id_){
+
+	}
+
+	private byte[] shuffle(byte[] byteArray) {
+		final Random randGenerator = new Random();;    
+		for (int lastPlace = byteArray.length - 1; lastPlace > 0; lastPlace--) {
+			// Choose a random location from 0..lastPlace
+			byte randLoc = (byte) (randGenerator(randGenerator).nextInt(lastPlace + 1));
+			// Swap items in locations randLoc and lastPlace
+			byte temp = byteArray[randLoc];
+			byteArray[randLoc] = byteArray[lastPlace];
+			byteArray[lastPlace] = temp;
+		}
+		return byteArray;
+	}
+
+	private Random randGenerator(Random randGenerator_) {
+		if (null == randGenerator_) {
+			randGenerator_ = new Random();
+		}
+		return randGenerator_;
+	} 
+
 
 }

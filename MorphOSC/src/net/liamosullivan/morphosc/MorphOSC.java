@@ -27,16 +27,12 @@ public class MorphOSC implements PConstants {
 	ControlP5 cp5;
 	//OscP5 oscP5;
 	// Defaults
-	int maxMParams = 32;
+	int maxMParams = 64;
 	int nMParams = 0;
 	int maxMLayers = 5;
 	int nMLayers = 0;
 	int mLayerW = 100, mLayerH = 100; // default dimensions of added MorphLayers
-	int[] paramColors = new int[maxMParams];
-	int[] mlFillColors = new int[maxMLayers];
-	int[] mlStrokeColors = new int[maxMLayers];
-	int paramOpac = 200, mlFillOpac = 100, mlStrokeOpac = 125;
-	int colourPad = 10;
+
 	// Display assets
 	private float lockX, lockY; // position of the GUI lock/unlock button
 	int lockImageScale = 4;
@@ -53,6 +49,9 @@ public class MorphOSC implements PConstants {
 	public boolean highlightControllers = true; // color controllers added as
 	// MorphParameters
 	public boolean useControlFrame= false;
+	public boolean useSoftwareBus = false; //sends data back to sketch
+	public boolean useOSCAgent = false; //sends data out via OSCAgent
+
 	MorphOSCView gui;
 
 	// Interaction flags
@@ -76,7 +75,7 @@ public class MorphOSC implements PConstants {
 
 	boolean addAnchorsToAllLayers = false;
 
-	private MorphOSCController mouseHandler;
+	private MorphOSCController moscController;
 	protected OSCAgent oscA;
 	//protected ControllerFrame GUI;
 
@@ -84,13 +83,7 @@ public class MorphOSC implements PConstants {
 
 		parent = p_;
 		cp5 = new ControlP5(parent);
-		paramColors = generateParamColors(maxMParams);
-		mlFillColors = generateLayerFills(maxMLayers);
-		mlStrokeColors = generateLayerStrokes(maxMLayers);
-
-		parent.colorMode(HSB, 255.0F);
-		parent.rectMode(CENTER);
-		parent.ellipseMode(CENTER);
+	
 
 		parent.registerMethod("pre", this);
 		parent.registerMethod("draw", this);
@@ -99,17 +92,17 @@ public class MorphOSC implements PConstants {
 		parent.registerMethod("keyEvent", this);
 		addMouseHandler();
 		addMorphOSCView();
-//		if(useControlFrame){
-//			GUI.addControlFrame("2", 500,500);
-//		}
+		//		if(useControlFrame){
+		//			GUI.addControlFrame("2", 500,500);
+		//		}
 		//oscP5 = new OscP5(this,8001);
 		addOSCAgent();
-		
+
 
 
 	}
 
-	
+
 	public PVector getLockPosition() {
 		PVector lk = new PVector(lockX, lockY);
 		return lk;
@@ -122,68 +115,18 @@ public class MorphOSC implements PConstants {
 
 	}
 
-	private int[] generateParamColors(int max_) {
-		int max = max_;
-		int baseHue = 255 / max;
-		// System.out.println("Base Hue is " +baseHue);
-		int baseBright = 200;
-		int baseSat = 200;
-		int[] pColors = new int[max];
-		for (int i = 0; i < max; i++) {
-			pColors[i] = parent.color(baseHue * (i + 1), baseSat, baseBright,
-					paramOpac);
-			System.out.println("pColours" + i + ": " + pColors[i]);
-		}
-
-		return pColors;
-	}
-
-	private int[] generateLayerFills(int max_) {
-		// ***TO DO: fix color gen for HSB space.
-		int max = max_;
-		int baseHue = 255 / max;
-		System.out.println("Base Hue is " + baseHue);
-		int baseBright = 200;
-		int baseSat = 150;
-		int[] fColors = new int[max];
-		for (int i = 0; i < max; i++) {
-			fColors[i] = parent.color(baseHue * (i + 1), baseSat, baseBright,
-					mlFillOpac);
-			System.out.println("fColours" + i + ": " + fColors[i]);
-		}
-
-		return fColors;
-	}
-
-	private int[] generateLayerStrokes(int max_) {
-		int max = max_;
-		int baseHue = 255 / max;
-		int baseBright = 200;
-		int baseSat = 150;
-		int[] sColors = new int[max];
-		for (int i = 0; i < max; i++) {
-			sColors[i] = parent.color(baseHue * (i + 1), baseSat * 2,
-					baseBright, mlStrokeOpac);
-			//System.out.println("sColours" + i + ": " + paramColors[i]);
-		}
-
-		return sColors;
-	}
-
 	public void addController(Controller c_) {
 		if (nMParams < maxMParams  && c_ instanceof Slider) {
 			Controller c = c_;
 			cList.add(c);
+			
 			Parser pr = new Parser(parent);
-			MorphParameter mp = pr.parseController(c, paramColors[nMParams]);
+			MorphParameter mp = pr.parseController(c);
 			mp.setId(nMParams);
 			mpList.add(mp);
 			nMParams += 1;
-			SafeZone sz = new SafeZone(parent, sZoneList.size(), c.getPosition().x, 
-					c.getPosition().y-c.getHeight()/4,(float) c.getWidth(), (float) c.getHeight()); //GUI lock
-			sz.setId(sZoneList.size());
-			sZoneList.add(sz); 
-			//System.out.println("Safe Zone #"+sz.getId()+" added to controller #"+c.getId());
+			addSafeZone(c);
+			
 
 		} else {
 			System.out.println("Can't add Controller, maximum reached");
@@ -200,6 +143,17 @@ public class MorphOSC implements PConstants {
 		}
 
 	}
+	
+	void addSafeZone(Controller c){
+		SafeZone sz = new SafeZone(parent, sZoneList.size(), c.getPosition().x, 
+				c.getPosition().y,(float) c.getWidth(), (float) c.getHeight()); 
+		sz.setId(sZoneList.size());
+		sZoneList.add(sz); 
+		System.out.println("Safe Zone #"+sz.getId()+" added to controller #"+c.getId()
+				+" @ ("+sz.getPosition().x+", "+sz.getPosition().y+")");
+
+	}
+
 
 	void addMorphLayer(PVector v_) {
 		// Used at runtime and called from mousePressed in this class only
@@ -208,10 +162,9 @@ public class MorphOSC implements PConstants {
 		int mly = (int) v.y;
 		if (nMLayers < maxMLayers) {
 			// MorphLayer(PApplet p_, int id_, int x_, int y_, int w_, int h_,
-			// int fC_, int sC_, int dispW_, int dispH_)
+			// int dispW_, int dispH_)
 			MorphLayer ml = new MorphLayer(parent, nMLayers, mlx, mly, mLayerW,
-					mLayerH, mlFillColors[nMLayers], mlStrokeColors[nMLayers],
-					parent.width, parent.height);
+					mLayerH, parent.width, parent.height);
 			mlList.add(ml);
 			nMLayers += 1;
 			System.out.println("MorphLayer added @: (" + mlx + ", " + mly
@@ -231,8 +184,7 @@ public class MorphOSC implements PConstants {
 			// MorphLayer(PApplet p_, int id_, int x_, int y_, int w_, int h_,
 			// int fC_, int sC_, int dispW_, int dispH_)
 			MorphLayer ml = new MorphLayer(parent, nMLayers, mlx, mly, mLayerW,
-					mLayerH, mlFillColors[nMLayers], mlStrokeColors[nMLayers],
-					parent.width, parent.height);
+					mLayerH, parent.width, parent.height);
 			mlList.add(ml);
 			nMLayers += 1;
 			System.out.println("MorphLayer added @: (" + mlx + ", " + mly
@@ -254,8 +206,7 @@ public class MorphOSC implements PConstants {
 			// MorphLayer(PApplet p_, int id_, int x_, int y_, int w_, int h_,
 			// int fC_, int sC_, int dispW_, int dispH_)
 			MorphLayer ml = new MorphLayer(parent, nMLayers, mlx, mly, wIn,
-					hIn, mlFillColors[nMLayers], mlStrokeColors[nMLayers],
-					parent.width, parent.height);
+					hIn, parent.width, parent.height);
 			mlList.add(ml);
 			nMLayers += 1;
 			System.out.println("MorphLayer added @: (" + mlx + ", " + mly
@@ -336,12 +287,11 @@ public class MorphOSC implements PConstants {
 
 	public void pre() {
 		parent.background(0);
-		
+
 
 	}
 
 	public void draw() {
-		gui.showMParameters();
 		gui.draw();
 		// System.out.println("Draw called");
 	}
@@ -354,19 +304,19 @@ public class MorphOSC implements PConstants {
 	switch (e.getAction()) {
 
 	case MouseEvent.PRESS:
-		mouseHandler.pressed(v);
+		moscController.pressed(v);
 		break;
 	case MouseEvent.RELEASE:
-		mouseHandler.released(v);
+		moscController.released(v);
 		break;
 	case MouseEvent.CLICK:
-		mouseHandler.clicked(v);
+		moscController.clicked(v);
 		break;
 	case MouseEvent.DRAG:
-		mouseHandler.dragged(v);
+		moscController.dragged(v);
 		break;
 	case MouseEvent.MOVE:
-		mouseHandler.moved(v);
+		moscController.moved(v);
 		break;
 	}
 	}
@@ -409,12 +359,12 @@ public class MorphOSC implements PConstants {
 	}
 
 	protected void addMouseHandler(){
-		mouseHandler = new MorphOSCController(this);
+		moscController = new MorphOSCController(this);
 
 	}
-	
+
 	protected void setMouseVector(PVector mv_) {
-	mouseVector = mv_;
+		mouseVector = mv_;
 
 	}
 
@@ -436,5 +386,23 @@ public class MorphOSC implements PConstants {
 		oscA.setMessage(msg_);
 		oscA.send();
 	}
+
+	public void setUseSoftwareBus(boolean in){
+		useSoftwareBus=in;	
+	}
+
+	public boolean getUseSoftwareBus(){
+		return useSoftwareBus;	
+	}
+
+	public void setUseOSCAgent(boolean in){
+		useOSCAgent=in;	
+	}
+
+	public boolean getUseOSCAgent(){
+		return useOSCAgent;	
+	}
+
+	
 
 }

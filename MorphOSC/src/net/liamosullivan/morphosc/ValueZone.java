@@ -29,12 +29,6 @@ public class ValueZone extends Zone {
 
 	}
 
-	void display(){
-		parent.rect(this.x,this.y,this.width,this.height);
-		parent.fill(255,200);
-		parent.textSize(this.size.y/2);
-		//parent.textAlign(0);
-		parent.text(parent.nf(value, 3, 1), this.x+2,this.y+this.size.y/2);
-	}
+	
 
 }

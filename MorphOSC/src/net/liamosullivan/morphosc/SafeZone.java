@@ -16,11 +16,5 @@ public class SafeZone extends Zone {
 		id=id_;
 
 	}
-	void display(){
-		parent.strokeWeight(2);
-		parent.rect(this.x,this.y,this.width,this.height);
 		
-	}
-	
-	
 }

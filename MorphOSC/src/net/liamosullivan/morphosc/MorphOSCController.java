@@ -55,13 +55,14 @@ public class MorphOSCController {
 					omsg.add(ml.getNMPs()); //add the number of MPs so that they can be parsed at OSC server
 					if(ml.getNMAs()>1){ //only try to interpolate if 2 or more anchors present in layer.
 						MorphParameter [] interps = ml.interpolate(v);
-						//System.out.print("Interp Values :");
+						//System.out.print("Interpolating Values :");
 						for(int j=0;j<interps.length;j+=1){
 							omsg.add(interps[j].getId());							
 							omsg.add(interps[j].getValue());
 						}
 						//System.out.println();
 						relayOSCMessage(omsg);
+						parent.gui.drawInterpPoint(v);
 					}
 
 				}
@@ -370,9 +371,11 @@ public class MorphOSCController {
 		setMouseVector(v);
 	}
 
+/////////////////////////////////////////////////////////////////////////////////Dragging behaviour
 	protected void dragged(PVector v_) {
 		PVector v = v_;
 		setMouseVector(v);
+		/////////////////////////////GUI Locked
 		if (parent.IsLocked) {
 			for (int i = parent.nMLayers - 1; i >= 0; i--) { 
 				MorphLayer ml = parent.mlList.get(i);
@@ -414,6 +417,7 @@ public class MorphOSCController {
 
 			}//end for loop
 		} 
+		////////////////////////////////////////////////////////////////GUI Unlocked
 		else if (!parent.IsLocked) {
 			if (parent.layerIsMoving) {
 				MorphLayer tlMove = parent.mlList.get(parent.movingLayer);
@@ -427,11 +431,9 @@ public class MorphOSCController {
 			if (parent.isDraggingMAnchor) {
 				MorphAnchor ma = parent.getMAFromLayerById(parent.dragMAnchorID[0], parent.dragMAnchorID[1]);
 				ma.move(PVector.sub(v, parent.mlList.get(parent.getMLayerIndexById(parent.dragMAnchorID[0])).getPosition()));
-				System.out.println("Dragging MorphAnchor");
+				//System.out.println("Dragging MorphAnchor");
 			}
-
 		}
-
 	}
 
 	protected void moved(PVector v_) {
@@ -485,7 +487,6 @@ public class MorphOSCController {
 	}
 
 	PVector getMouseVector() {
-
 		return parent.mouseVector;
 
 	}
