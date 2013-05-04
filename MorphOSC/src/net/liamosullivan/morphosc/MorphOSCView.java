@@ -82,36 +82,6 @@ public class MorphOSCView {
 		return hues;
 	}
 
-	//	private int[] generateLayerFills(int max_) {
-	//		// ***TO DO: fix color gen for HSB space.
-	//		int max = max_;
-	//		int baseHue = 255 / max;
-	//		System.out.println("Base Layer Fill Hue is " + baseHue);
-	//		int[] fColors = new int[max];
-	//		for (int i = 0; i < max; i++) {
-	//			fColors[i] = grandparent.color(baseHue/2, baseSat, baseBright,
-	//					mlFillOpac);
-	//			//System.out.println("fColours" + i + ": " + fColors[i]);
-	//		}
-	//
-	//		return fColors;
-	//	}
-	//
-	//	private int[] generateLayerStrokes(int max_) {
-	//		int max = max_;
-	//		int baseHue = 255 / max;
-	//		int baseBright = 200;
-	//		int baseSat = 150;
-	//		int[] sColors = new int[max];
-	//		for (int i = 0; i < max; i++) {
-	//			sColors[i] = grandparent.color(baseHue * (i + 1), baseSat * 2,
-	//					baseBright, mlStrokeOpac);
-	//			//System.out.println("sColours" + i + ": " + paramColors[i]);
-	//		}
-	//
-	//		return sColors;
-	//	}
-
 	protected void draw() {
 		//draw layers
 		for (int i = 0; i < parent.mlList.size(); i += 1) {
@@ -134,11 +104,8 @@ public class MorphOSCView {
 		else if(parent.isDraggingMPValue){
 			drawDraggingMPV();
 		}
-		
-		
-
 	}
-	//show MorphParameters on Layer
+	
 	// Image for lock status (deprecated)
 	//if (IsLocked) {
 	//			parent.image(locked, lockX, lockY, locked.width,
@@ -192,19 +159,13 @@ public class MorphOSCView {
 	//draw MorphParameter swatch 
 	void drawMPSwatch(MorphParameter p_){
 		//Display a colour swatch next to controller at SelectZone 
-		//grandparent.rectMode(PApplet.CORNER); 
 		grandparent.pushStyle();
 		grandparent.rectMode(PApplet.CORNER);
 		grandparent.noStroke();
-		//grandparent.fill(255);
 		grandparent.fill(mpHues[p_.getId()], baseStrokeSat, baseStrokeBright, mpOpac);
 		grandparent.rect(p_.getPosition().x-20, p_.getPosition().y, p_.getSize().y, p_.getSize().y);
 		grandparent.popStyle();
-		//slz.display();
-		//grandparent.stroke(getStrokeByID(p_.getId()));
-		//grandparent.noFill();
-		//vlz.display();
-		//grandparent.rectMode(PApplet.CENTER); //0 for CORNER, 3 for CENTER
+		
 	}
 	void drawMPValue(MorphParameter p_){
 
