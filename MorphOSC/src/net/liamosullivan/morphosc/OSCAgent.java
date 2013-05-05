@@ -21,8 +21,8 @@ public class OSCAgent {
 		sendPort = 8001;
 		localAddrString = getLocalAddress(); //returns loopback address
 		//localAddrString = "192.168.1.11";
-		remoteAddrString = "127.0.0.1";
-		//remoteAddrString = "192.168.42.175"; //laptop using ethernet tether
+		//remoteAddrString = "127.0.0.1";
+		remoteAddrString = "192.168.42.29"; //laptop using ethernet tether
 		debugString = "OSC ok!";
 		portInit();
 		addrInit();

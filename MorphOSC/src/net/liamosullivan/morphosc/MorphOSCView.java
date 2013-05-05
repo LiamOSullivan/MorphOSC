@@ -159,14 +159,17 @@ public class MorphOSCView {
 	//draw MorphParameter swatch 
 	void drawMPSwatch(MorphParameter p_){
 		//Display a colour swatch next to controller at SelectZone 
+		
 		grandparent.pushStyle();
 		grandparent.rectMode(PApplet.CORNER);
 		grandparent.noStroke();
 		grandparent.fill(mpHues[p_.getId()], baseStrokeSat, baseStrokeBright, mpOpac);
-		grandparent.rect(p_.getPosition().x-20, p_.getPosition().y, p_.getSize().y, p_.getSize().y);
+		grandparent.rect(p_.getSelectZone().pos.x, p_.getSelectZone().pos.y, 
+				p_.getSelectZone().getSize().x, p_.getSelectZone().getSize().y);
 		grandparent.popStyle();
 		
 	}
+	
 	void drawMPValue(MorphParameter p_){
 
 		grandparent.pushStyle();
@@ -176,7 +179,7 @@ public class MorphOSCView {
 		grandparent.noFill();
 		//grandparent.fill(mpHues[p_.getId()], baseStrokeSat, baseStrokeBright, mpOpac);
 		grandparent.rect(p_.getValueZone().getPosition().x, p_.getValueZone().getPosition().y
-				, p_.getValueZone().getSize().x, p_.getValueZone().getSize().y);
+				,p_.getValueZone().getSize().x, p_.getValueZone().getSize().y);
 
 		grandparent.fill(255,200);
 		grandparent.textSize((p_.getValueZone().getSize().y/2));
@@ -334,9 +337,6 @@ public class MorphOSCView {
 		}
 		grandparent.popStyle();
 
-
-
-
 	}
 
 	///////////////////////////////////////////////////////////////////////////// objects being dragged
@@ -395,7 +395,7 @@ public class MorphOSCView {
 	void setStrokeByID(int id_){
 
 	}
-
+//////////////////////////////////////////////////////////////////////////////color management
 	private byte[] shuffle(byte[] byteArray) {
 		final Random randGenerator = new Random();;    
 		for (int lastPlace = byteArray.length - 1; lastPlace > 0; lastPlace--) {

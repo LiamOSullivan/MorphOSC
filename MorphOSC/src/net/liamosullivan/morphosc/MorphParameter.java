@@ -17,13 +17,14 @@ public class MorphParameter
 	int c;
 	PVector p; //position of original controller
 	PVector size; //size of original controller
+	boolean isVertical;
+
 	SelectZone slz;
 	ValueZone vlz;
 	SafeZone sfz;
 	private PVector szPosition;
-	private int padding  = 20;
-
-	MorphParameter(PApplet par_, int id_, String name_)
+	private int vPad  = 20, hPad =40; // Amount of Select/Value Zone spacing from controllerPa
+ 	MorphParameter(PApplet par_, int id_, String name_)
 	{
 		this.parent=par_;
 		this.id = id_;
@@ -59,6 +60,7 @@ public class MorphParameter
 
 	void setSize(PVector p_) {
 		this.size = p_;
+		checkIsVertical();
 	}
 
 	PVector getSize() {
@@ -98,14 +100,15 @@ public class MorphParameter
 		this.mn = f;
 	}
 
-	void setControllerColor()
-	{
-	}
-
 	void addSelectZone(){
-
-		slz = new SelectZone(parent, (float)(this.p.x - padding), (float)(p.y),
-				(float)padding, (float)this.size.y);
+		if(!isVertical){
+		slz = new SelectZone(parent, (float)(this.p.x - hPad), (float)(p.y),
+				(float)hPad, (float)this.size.y);
+		}
+		else{
+		slz = new SelectZone(parent, (float)(this.p.x), (float)(p.y - vPad),
+					(float)this.size.x, (float)vPad);
+		}
 
 	}
 
@@ -115,14 +118,21 @@ public class MorphParameter
 	}
 
 	protected void addValueZone(){
-		vlz = new ValueZone(parent, (float)(this.p.x + this.size.x+padding), p.y,
-				padding*1.5F, (float)this.size.y, value);
+
+		if(!isVertical){
+		vlz = new ValueZone(parent, (float)(this.p.x + this.size.x+hPad), p.y,
+				hPad*1.5F, (float)this.size.y, value);
+		}
+		else{
+		vlz = new ValueZone(parent, (float)(this.p.x ), p.y+ this.size.y + vPad,
+				(float)this.size.x, vPad, value);
+		}
 
 	}
-	
+
 	protected ValueZone getValueZone(){
 		return vlz;
-		
+
 	}
 
 	protected float getVZValue(){
@@ -132,6 +142,16 @@ public class MorphParameter
 
 	protected void setVZValue(float v_){
 		vlz.setValue(v_);
+
+	}
+
+	private void checkIsVertical(){
+		if (size.x<size.y){
+			isVertical = true;	
+		}
+		else{
+			isVertical = false;
+		}
 
 	}
 

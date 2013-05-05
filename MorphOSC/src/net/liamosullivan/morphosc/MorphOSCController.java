@@ -36,7 +36,7 @@ public class MorphOSCController {
 			for (int i = 0; i < parent.sZoneList.size() && keepChecking; i += 1) { 
 				SafeZone sz = parent.sZoneList.get(i);
 				if (sz.select(v)) {
-					//					System.out.println("Safe Zone " + sz.getId() + " selected");
+					//					//System.out.println("Safe Zone " + sz.getId() + " selected");
 					if(sz.getId()==0){ //safe 0 is GUI lock toggle
 						parent.IsLocked=!parent.IsLocked;
 					}
@@ -55,12 +55,12 @@ public class MorphOSCController {
 					omsg.add(ml.getNMPs()); //add the number of MPs so that they can be parsed at OSC server
 					if(ml.getNMAs()>1){ //only try to interpolate if 2 or more anchors present in layer.
 						MorphParameter [] interps = ml.interpolate(v);
-						//System.out.print("Interpolating Values :");
+						////System.out.print("Interpolating Values :");
 						for(int j=0;j<interps.length;j+=1){
 							omsg.add(interps[j].getId());							
 							omsg.add(interps[j].getValue());
 						}
-						//System.out.println();
+						////System.out.println();
 						relayOSCMessage(omsg);
 						parent.gui.drawInterpPoint(v);
 					}
@@ -69,7 +69,7 @@ public class MorphOSCController {
 				keepChecking = false; //place inside above condition?
 			}
 			if (keepChecking) {
-				// System.out.println(" Free space ");
+				// //System.out.println(" Free space ");
 			}
 
 		}  
@@ -81,7 +81,7 @@ public class MorphOSCController {
 			for (int i = 0; i < parent.sZoneList.size() && keepChecking; i += 1) { 
 				SafeZone sz = parent.sZoneList.get(i);
 				if (sz.select(v)) {
-					//					System.out.println("Safe Zone " + sz.getId() + " selected");
+					//					//System.out.println("Safe Zone " + sz.getId() + " selected");
 					if(sz.getId()==0){ //safe 0 is GUI lock toggle
 						parent.IsLocked=!parent.IsLocked;
 					}
@@ -95,7 +95,7 @@ public class MorphOSCController {
 				MorphParameter mp = parent.mpList.get(i);
 				SelectZone slz = mp.getSelectZone();
 				if (slz.select(v)) {
-					//					System.out.println(" MorphParameter " + mp.getId()
+					//					//System.out.println(" MorphParameter " + mp.getId()
 					//							+ " selected");
 					parent.isDraggingMParameter = true;
 					parent.dragMParamID = i;
@@ -109,13 +109,13 @@ public class MorphOSCController {
 				MorphParameter mp = parent.mpList.get(i);
 				ValueZone vlz = mp.getValueZone();
 				if (vlz.select(v)) {
-					//					System.out.println(" MorphParameter value id" + mp.getId()
+					//					//System.out.println(" MorphParameter value id" + mp.getId()
 					//							+ " selected");
 					parent.isDraggingMPValue = true;
 					parent.draggingMPValue = i;
 					parent.mpValue = parent.cList.get(i).getValue(); // get the value from the
 					// controller
-					//System.out.println(" MPValue is:  " + mpValue);
+					////System.out.println(" MPValue is:  " + mpValue);
 					keepChecking = false;
 
 				}
@@ -124,7 +124,7 @@ public class MorphOSCController {
 			for (int i = parent.nMLayers - 1; i >= 0 && keepChecking; i--) { 
 				MorphLayer tl = parent.mlList.get(i);
 				if (tl.selectHandle(v)) {
-					//					System.out.println(" Layer " + i + " Handle selected");
+					//					//System.out.println(" Layer " + i + " Handle selected");
 					keepChecking = false;
 					parent.resizeLayer = i;
 					parent.layerIsResizing = true;
@@ -134,7 +134,7 @@ public class MorphOSCController {
 			for (int i = parent.nMLayers - 1; i >= 0 && keepChecking; i--) {
 				MorphLayer tl = parent.mlList.get(i);
 				if (tl.selectBar(v)) {
-					//	System.out.println(" Layer " + i + " bar selected");
+					//	//System.out.println(" Layer " + i + " bar selected");
 					keepChecking = false;
 					parent.movingLayer = i;
 					parent.layerIsMoving = true;
@@ -145,14 +145,14 @@ public class MorphOSCController {
 			for (int i = parent.nMLayers-1 ; i >= 0 && keepChecking; i--) {
 				MorphLayer tl = parent.mlList.get(i);
 				if (tl.select(v)) {
-					//System.out.println(" Layer " + i + " selected");
+					////System.out.println(" Layer " + i + " selected");
 					// Check if over a MorphAnchor on this layer
 					ArrayList mal = tl.getMAList();   
 					for(int j =0;j<mal.size();j+=1)
 					{
 						MorphAnchor ma = (MorphAnchor) mal.get(j);
 						if (ma.select(PVector.sub(v, tl.getPosition()))){
-							System.out.println("Selecting MA #"+ma.getId()+" on layer #"+tl.id);
+							//System.out.println("Selecting MA #"+ma.getId()+" on layer #"+tl.id);
 							parent.isDraggingMAnchor = true;
 							parent.dragMAnchorID[0] = tl.id; //anchor layer
 							parent.dragMAnchorID[1] = ma.getId(); //anchorID
@@ -167,14 +167,14 @@ public class MorphOSCController {
 					// Hack to ignore click over open settings menu
 					// TO DO: Add ability to drag-and-drop parameters from here
 				} else {
-					//					System.out.println(" Left-Click in free space ");
+					//					//System.out.println(" Left-Click in free space ");
 					parent.addMorphLayer(v);
 				}
 			} else {
 				// do nothing if keepChecking is false
 			}
 		}
-		// System.out.println("MousePressed");
+		// //System.out.println("MousePressed");
 	}
 
 	///////////////////////////////////////////////////////////////////////Release Behavior
@@ -214,12 +214,12 @@ public class MorphOSCController {
 			boolean keepChecking = true;
 			MorphParameter mpVDrag = parent.mpList.get(parent.draggingMPValue);
 			mpVDrag.setValue(parent.mpValue);
-			//System.out.println("Value of mpVDrag is "+mpValue);
+			////System.out.println("Value of mpVDrag is "+mpValue);
 			// check if mouse released over any layers
 			for (int j= parent.nMLayers-1;j>=0 && keepChecking; j--) {
-				//System.out.println("Getting layer #"+j);
+				////System.out.println("Getting layer #"+j);
 				MorphLayer ml = parent.mlList.get(j);
-				//System.out.println("Got layer #"+j);
+				////System.out.println("Got layer #"+j);
 				if (ml.select(v)) {
 					//Get parent.mpList and maList list for the layer(s)
 					ArrayList mpl = (ArrayList)ml.getMPList();
@@ -227,24 +227,24 @@ public class MorphOSCController {
 					//1. new MP is NOT in layer, there are NO MPs in Layer, there are NO anchors
 					//add new MP to layer, add MP to new MA, add MA to Layer
 					if (!mpl.contains(mpVDrag)&& mpl.size()==0 && mal.size()==0) {
-						System.out.println("Case 1");
+						//System.out.println("Case 1");
 						ml.addMorphParameter(mpVDrag);
 						//No MPs means no existing anchors, so just
 						//Add an anchor and add the MP and value to it...
 						MorphAnchor maNew = new MorphAnchor(mal.size(), v); //id and position vector
 						maNew.addMorphParameter(mpVDrag);
 						maNew.setMorphParameterValueById(mpVDrag.getId(), parent.mpValue);
-						System.out.println("MorphAnchor #"+maNew.getId()+" to be added to Layer #"+ j);
+						//System.out.println("MorphAnchor #"+maNew.getId()+" to be added to Layer #"+ j);
 						ml.addMorphAnchor(maNew); //adds MA to maList
 					}
 
 					//2. new MP is NOT in layer, there ARE MPs in Layer, there are NO anchors 
 					//add new MP to layer, add existing MPs (with values) to new anchor, add anchor 
 					else if (!mpl.contains(mpVDrag) && mpl.size()>0 && mal.size()==0){
-						System.out.println("Case 2");
+						//System.out.println("Case 2");
 						ml.addMorphParameter(mpVDrag); 
 						MorphAnchor maNew = new MorphAnchor(mal.size(), v);
-						//System.out.println("Adding existing MPs to new Anchor");
+						////System.out.println("Adding existing MPs to new Anchor");
 						for(int p=0;p<mpl.size();p+=1){
 							MorphParameter mpExists = (MorphParameter)mpl.get(p);  //TODO: get rid of cast
 							maNew.addMorphParameter(mpExists);
@@ -259,32 +259,32 @@ public class MorphOSCController {
 					//if not- create anchor, add existing MPs to new MA, 
 					//update all MAs with new MP, add MA 
 					else if (!mpl.contains(mpVDrag) && mpl.size()>0 && mal.size()>0){
-						System.out.println("Case 3");
+						//System.out.println("Case 3");
 						ml.addMorphParameter(mpVDrag);
 						int anchorIndex = checkOverAnchor(v, mpVDrag, ml);
 						if(anchorIndex == -1){
 							MorphAnchor maNew = new MorphAnchor(mal.size(), v);
 							for(int p=0;p<mpl.size();p+=1){
-								System.out.println("Debug 1");
+								//System.out.println("Debug 1");
 								MorphParameter mpExists = (MorphParameter)mpl.get(p);  //TODO: get rid of cast
 								maNew.addMorphParameter(mpExists);
 								maNew.setMorphParameterValueById(mpExists.getId(),mpExists.getValue()); //TODO: determine how to set values of MPs with existing MAs
 
-								//System.out.println("Existing MP #"+mpExists.getId()+" has value "+mpExists.getValue());
+								////System.out.println("Existing MP #"+mpExists.getId()+" has value "+mpExists.getValue());
 							}
 							ml.addMorphAnchor(maNew); //adds MA to maList
 							//update all anchors with all other params
 							//Add all MPs to new MA//							
 						}
 						else{
-							System.out.println("Debug 2");
+							//System.out.println("Debug 2");
 							ArrayList mas = ml.getMAList();
 							MorphAnchor ma = (MorphAnchor)mas.get(anchorIndex);
 							ma.addMorphParameter(mpVDrag);
-							System.out.println("parent.mpValue: "+parent.mpValue);
+							//System.out.println("parent.mpValue: "+parent.mpValue);
 							ma.setMorphParameterValueById(mpVDrag.getId(), parent.mpValue);
 
-							//System.out.println("Over existing anchor!");
+							////System.out.println("Over existing anchor!");
 						}
 						//update all anchors with all other params
 						for(int p=0;p<mal.size();p+=1){
@@ -299,20 +299,20 @@ public class MorphOSCController {
 					}
 					//4. MP in layer, so MPList size >0, but NO anchors
 					else if (mpl.contains(mpVDrag) && mal.size()==0){
-						System.out.println("Case 4");
+						//System.out.println("Case 4");
 						MorphAnchor maNew = new MorphAnchor(mal.size(), v);
 						for(int p=0;p<mpl.size();p+=1){
 							MorphParameter mpExists = (MorphParameter)mpl.get(p);  //TODO: get rid of cast
 							maNew.addMorphParameter(mpExists);
 							maNew.setMorphParameterValueById(mpExists.getId(),mpExists.getValue()); //TODO: determine how to set values of MPs with existing MAs
-							//System.out.println("Existing MP #"+mpExists.getId()+" has value "+mpExists.getValue());
+							////System.out.println("Existing MP #"+mpExists.getId()+" has value "+mpExists.getValue());
 						}
 						ml.addMorphAnchor(maNew); //adds MA to maList
 					}
 					//5. MP in layer, there ARE anchors
 					//TODO: Add ability to drop values on existing anchors here
 					else if (mpl.contains(mpVDrag) && mal.size()>0){
-						System.out.println("Case 5");
+						//System.out.println("Case 5");
 						//check if over an anchor, if so set the MP value, if not create anchor
 						int anchorIndex = checkOverAnchor(v, mpVDrag, ml);
 						if(anchorIndex == -1){
@@ -321,7 +321,7 @@ public class MorphOSCController {
 								MorphParameter mpExists = (MorphParameter)mpl.get(p);  //TODO: get rid of cast
 								maNew.addMorphParameter(mpExists);
 								maNew.setMorphParameterValueById(mpExists.getId(),mpExists.getValue()); //TODO: determine how to set values of MPs with existing MAs
-								//System.out.println("Existing MP #"+mpExists.getId()+" has value "+mpExists.getValue());
+								////System.out.println("Existing MP #"+mpExists.getId()+" has value "+mpExists.getValue());
 							}
 							ml.addMorphAnchor(maNew); //adds MA to maList
 							//update all anchors with all other params
@@ -329,7 +329,7 @@ public class MorphOSCController {
 						else{
 							MorphAnchor ma = (MorphAnchor)mal.get(anchorIndex); 
 							ma.setMorphParameterValueById(mpVDrag.getId(), parent.mpValue);
-							//System.out.println("Over existing anchor!");
+							////System.out.println("Over existing anchor!");
 						}
 
 						for(int p=0;p<mal.size();p+=1){
@@ -388,22 +388,22 @@ public class MorphOSCController {
 						OscMessage omsg = new OscMessage("/morphOSC");
 						omsg.add(ml.getId());
 						omsg.add(ml.getNMPs()); //add the number of MPs so that they can be parsed at OSC server
-						//						System.out.print("Layer " + i + " selected");
-						//						System.out.println(" has " + ml.getNMAs() + " anchors");
+						//						//System.out.print("Layer " + i + " selected");
+						//						//System.out.println(" has " + ml.getNMAs() + " anchors");
 						if(ml.getNMAs()>1){ //only try to interpolate if 2 or more anchors present in layer.
 							MorphParameter [] interps = ml.interpolate(v);
-							//System.out.print("Interp Values :");
+							////System.out.print("Interp Values :");
 							for(int j=0;j<interps.length;j+=1){
-								System.out.print("\t "								
+								//System.out.print("\t "								
 										//+interps[i].getName() +"\t "
-										+interps[j].getId() +"\t "
-										+PApplet.nf(interps[j].getValue(), 2, 2)+"\t "
-										);
+										//+interps[j].getId() +"\t "
+										//+PApplet.nf(interps[j].getValue(), 2, 2)+"\t "
+										//);
 
 								omsg.add(interps[j].getId());							
 								omsg.add(interps[j].getValue());
 							}
-							System.out.println();
+							//System.out.println();
 							relayOSCMessage(omsg);
 
 						}
@@ -431,7 +431,7 @@ public class MorphOSCController {
 			if (parent.isDraggingMAnchor) {
 				MorphAnchor ma = parent.getMAFromLayerById(parent.dragMAnchorID[0], parent.dragMAnchorID[1]);
 				ma.move(PVector.sub(v, parent.mlList.get(parent.getMLayerIndexById(parent.dragMAnchorID[0])).getPosition()));
-				//System.out.println("Dragging MorphAnchor");
+				////System.out.println("Dragging MorphAnchor");
 			}
 		}
 	}
@@ -443,7 +443,7 @@ public class MorphOSCController {
 		for (int i = parent.nMLayers - 1; i >= 0 && keepChecking; i--) { 
 			MorphLayer tl = parent.mlList.get(i);
 			if (tl.selectHandle(v)) {
-				//				System.out.println("Over handle " + tl.handleId
+				//				//System.out.println("Over handle " + tl.handleId
 				//						+ " for layer id " + tl.id);
 				tl.isOverHandle = true;
 				tl.isOverLayer = true;

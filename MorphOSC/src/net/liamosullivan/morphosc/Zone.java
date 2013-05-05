@@ -8,7 +8,7 @@ public class Zone {
 	int id;
 	protected float x;
 	protected float y;
-	private PVector pos;
+	protected PVector pos;
 	protected float width;
 	protected float height;
 	protected PVector size;
@@ -58,7 +58,9 @@ public class Zone {
 	void setPosition(PVector p_){
 
 		this.pos.x = p_.x;
-		this.pos.y = p_.y-this.size.y/4;
+		this.pos.y = p_.y;
+		this.x=this.pos.x;
+		this.y=this.pos.y; 
 	}
 
 	PVector getPosition(){
@@ -69,7 +71,9 @@ public class Zone {
 	void setSize(PVector p_){
 
 		this.size.x = p_.x;
-		this.size.y = p_.y*2;
+		this.size.y = p_.y;
+		this.width=this.size.x;
+		this.height=this.size.y;
 	}
 
 	PVector getSize(){
