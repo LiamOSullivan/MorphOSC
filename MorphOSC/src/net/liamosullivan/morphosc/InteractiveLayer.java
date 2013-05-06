@@ -27,7 +27,7 @@ implements PConstants
 	int dispHeight;
 	int noOfHandles = 4;
 	int handleId = 0;
-	float handleSize = 20.0F;
+	float handleSize = 40.0F;
 	float[] handleX;
 	float[] handleY;
 	int barH = 20;
@@ -38,8 +38,8 @@ implements PConstants
 	boolean verboseDisplay = false; boolean displayContents = true;
 	boolean isOverHandle = false; boolean isOverLayer = false; boolean isOverLayerBar = false; boolean isDraggingOnLayer = false;
 
-	private final float MIN_WIDTH =50.0F;
-	private final float MIN_HEIGHT =50.0F;
+	private final float MIN_WIDTH =100.0F;
+	private final float MIN_HEIGHT =100.0F;
 
 
 	InteractiveLayer(PApplet p_, int id_, int x_, int y_, int width_, int height_, int dispW_, int dispH_)

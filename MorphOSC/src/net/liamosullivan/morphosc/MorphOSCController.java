@@ -168,7 +168,7 @@ public class MorphOSCController {
 					// TO DO: Add ability to drag-and-drop parameters from here
 				} else {
 					//					//System.out.println(" Left-Click in free space ");
-					parent.addMorphLayer(v);
+					//parent.addMorphLayer(v);
 				}
 			} else {
 				// do nothing if keepChecking is false
@@ -251,7 +251,7 @@ public class MorphOSCController {
 							maNew.setMorphParameterValueById(mpExists.getId(),mpExists.getValue()); //TODO: determine how to set values of MPs with existing MAs
 						}
 						ml.addMorphAnchor(maNew); //adds MA to maList
-						
+
 					}
 
 					//3. new MP is NOT in layer, there ARE MPs in Layer, there are ARE anchors 
@@ -295,7 +295,7 @@ public class MorphOSCController {
 
 							}
 						}
-						
+
 					}
 					//4. MP in layer, so MPList size >0, but NO anchors
 					else if (mpl.contains(mpVDrag) && mal.size()==0){
@@ -371,7 +371,38 @@ public class MorphOSCController {
 		setMouseVector(v);
 	}
 
-/////////////////////////////////////////////////////////////////////////////////Dragging behaviour
+	protected void dblClicked(PVector v_) {
+		PVector v = v_;
+		setMouseVector(v);
+		//System.out.println("DBL CLick Add Morph Layer");
+		/////////////////////////////GUI Locked
+		if (parent.IsLocked) {
+
+		}
+		////////////////////////////////////////////////////////////////GUI Unlocked
+		else if (!parent.IsLocked) {
+			boolean keepChecking = true;
+			for (int i = parent.nMLayers - 1; i >= 0 && keepChecking; i--) {
+				MorphLayer ml = parent.mlList.get(i);
+				if (ml.select(v)) {
+					keepChecking=false;
+				}
+
+			}
+			for (int i = 0; i < parent.sZoneList.size() && keepChecking; i += 1) { 
+				SafeZone sz = parent.sZoneList.get(i);
+				if (sz.select(v)) {
+					//System.out.println("Safe Zone " + sz.getId() + " selected");
+					keepChecking=false;
+				}
+			}
+			if(keepChecking){
+				parent.addMorphLayer(v);
+			}
+		}
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////Dragging behaviour
 	protected void dragged(PVector v_) {
 		PVector v = v_;
 		setMouseVector(v);
@@ -395,10 +426,10 @@ public class MorphOSCController {
 							////System.out.print("Interp Values :");
 							for(int j=0;j<interps.length;j+=1){
 								//System.out.print("\t "								
-										//+interps[i].getName() +"\t "
-										//+interps[j].getId() +"\t "
-										//+PApplet.nf(interps[j].getValue(), 2, 2)+"\t "
-										//);
+								//+interps[i].getName() +"\t "
+								//+interps[j].getId() +"\t "
+								//+PApplet.nf(interps[j].getValue(), 2, 2)+"\t "
+								//);
 
 								omsg.add(interps[j].getId());							
 								omsg.add(interps[j].getValue());

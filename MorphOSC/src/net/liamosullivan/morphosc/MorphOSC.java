@@ -83,7 +83,7 @@ public class MorphOSC implements PConstants {
 
 		parent = p_;
 		cp5 = new ControlP5(parent);
-	
+
 
 		parent.registerMethod("pre", this);
 		parent.registerMethod("draw", this);
@@ -119,14 +119,14 @@ public class MorphOSC implements PConstants {
 		if (nMParams < maxMParams  && c_ instanceof Slider) {
 			Controller c = c_;
 			cList.add(c);
-			
+
 			Parser pr = new Parser(parent);
 			MorphParameter mp = pr.parseController(c);
 			mp.setId(nMParams);
 			mpList.add(mp);
 			nMParams += 1;
 			addSafeZone(c);
-			
+
 
 		} else {
 			System.out.println("Can't add Controller, maximum reached");
@@ -143,7 +143,7 @@ public class MorphOSC implements PConstants {
 		}
 
 	}
-	
+
 	void addSafeZone(Controller c){
 		SafeZone sz = new SafeZone(parent, sZoneList.size(), c.getPosition().x, 
 				c.getPosition().y,(float) c.getWidth(), (float) c.getHeight()); 
@@ -160,20 +160,7 @@ public class MorphOSC implements PConstants {
 		PVector v = v_;
 		int mlx = (int) v.x;
 		int mly = (int) v.y;
-		if (nMLayers < maxMLayers) {
-			// MorphLayer(PApplet p_, int id_, int x_, int y_, int w_, int h_,
-			// int dispW_, int dispH_)
-			MorphLayer ml = new MorphLayer(parent, nMLayers, mlx, mly, mLayerW,
-					mLayerH, parent.width, parent.height);
-			mlList.add(ml);
-			nMLayers += 1;
-			System.out.println("MorphLayer added @: (" + mlx + ", " + mly
-					+ "), now there are " + nMLayers);
-
-		} else {
-			System.out.println("Can't add Morph Layer, maximum reached");
-		}
-
+		addMorphLayer(mlx,mly);
 	}
 
 	public void addMorphLayer(int x_, int y_) {
@@ -193,6 +180,14 @@ public class MorphOSC implements PConstants {
 		} else {
 			System.out.println("Can't add Morph Layer, maximum reached");
 		}
+
+	}
+
+	public void addMorphLayer(float x_, float y_) {
+		// Used if called with 2 arguments
+		int mlx = (int)x_;
+		int mly = (int)y_;
+		addMorphLayer(mlx, mly);
 
 	}
 
@@ -217,6 +212,14 @@ public class MorphOSC implements PConstants {
 		}
 
 	}
+	public void addMorphLayer(float x_, float y_, float wIn_, float hIn_) {
+		// Used if called with 4 arguments
+		int mlx = (int) x_;
+		int mly = (int) y_;
+		int wIn = (int) wIn_;
+		int hIn = (int) hIn_;
+		addMorphLayer(mlx,mly,wIn,hIn);
+	}
 
 	public void getControllerInfo() {
 		for (int i = 0; i < cList.size(); i++) {
@@ -225,9 +228,9 @@ public class MorphOSC implements PConstants {
 			String name = c.getName();
 			String add = c.getAddress();
 			String val = Float.toString(c.getValue());
-			//			System.out.print("Controller " + i + "\t Label: " + label
-			//					+ "\t Name: " + name);
-			//			System.out.println("\t Address: " + add + "\t Value: " + val);
+			System.out.print("Controller " + i + "\t Label: " + label
+					+ "\t Name: " + name);
+			System.out.println("\t Address: " + add + "\t Value: " + val);
 		}
 	}
 
@@ -310,8 +313,12 @@ public class MorphOSC implements PConstants {
 		moscController.released(v);
 		break;
 	case MouseEvent.CLICK:
-		moscController.clicked(v);
-		break;
+		if(e.getClickCount()==1){
+			moscController.clicked(v);
+		}
+		else if(e.getClickCount()==2){ 
+			moscController.dblClicked(v);
+		}
 	case MouseEvent.DRAG:
 		moscController.dragged(v);
 		break;
@@ -354,7 +361,6 @@ public class MorphOSC implements PConstants {
 	}
 
 	private void relay(){
-
 
 	}
 
@@ -403,6 +409,16 @@ public class MorphOSC implements PConstants {
 		return useOSCAgent;	
 	}
 
-	
+	public boolean getVerboseMode(){
+
+		return gui.verboseMode;
+	}
+
+	public void setVerboseMode(boolean mode_){
+
+		gui.verboseMode=mode_;
+	}
+
+
 
 }

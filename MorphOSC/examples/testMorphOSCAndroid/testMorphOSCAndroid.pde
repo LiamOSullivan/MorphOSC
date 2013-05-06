@@ -1,5 +1,5 @@
 /*
-Test sketch for Desktop MorphOSC
+Test sketch for MorphOSC
  
  */
 import net.liamosullivan.morphosc.*;
@@ -8,7 +8,7 @@ import controlP5.*;
 MorphOSC m;
 ControlP5 cp5;
 Slider s1, s2, s3, s4;
-int sliderX = 50, sliderY = 20, sliderH = 40, sliderW= 200;
+int sliderX = 50, sliderY = 20, sliderH = 40, sliderW= 160;
 Button b;
 
 PFont font;
@@ -68,6 +68,7 @@ void setup() {
   m.addAllControllers(cp5); //add all silders to MorphOSC
   m.getControllerInfo(); //print the controllers added to MorphOSC only
   m.addMorphLayer(width/2, height/2); //MorphLayer can be added in the sketch or via interaction at runtime
+  m.setVerboseMode(false);
 }
 
 void draw() {

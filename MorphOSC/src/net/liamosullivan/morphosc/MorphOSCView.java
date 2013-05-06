@@ -15,7 +15,7 @@ public class MorphOSCView {
 	ControllerFrame cf;
 	ControlP5 cp5View;
 	Toggle lockToggle;
-	boolean verboseMode = true;
+	boolean verboseMode = false;
 	boolean displayLayerContents =true;
 	//MorphLayer properties
 	float mlw, mlh;
@@ -23,8 +23,8 @@ public class MorphOSCView {
 	PFont font;
 	PFont boldFont;
 	int textH = 22;
-	int iPtSize = 10;
-	int mpSwatchSize =20;
+	int iPtSize = 30, anchorSize=20;
+	int dragSwatchSize =40;
 	int anchorTextSize = 20;
 	int layerTextSize = 40;
 	int dialogTextSize = 30;
@@ -35,7 +35,7 @@ public class MorphOSCView {
 	byte[] mlHues; 
 	int mpOpac = 200, mlFillOpac = 100, mlStrokeOpac = 150; 
 	int mlStrokeWeight = 3, mpvStrokeWeight =2;
-	int mlSwatchW =5;
+	int mlSwatchW =10;
 
 	public MorphOSCView(PApplet grandparent_, MorphOSC parent_) {
 
@@ -255,7 +255,7 @@ public class MorphOSCView {
 		//drawLayerBar + main layer
 		grandparent.pushStyle();
 		grandparent.strokeWeight(mlStrokeWeight);
-		if (ml_.isOverLayerBar) {
+		if (ml_.isOverLayerBar&&!parent.IsLocked) {
 			grandparent.stroke(mlHues[ml_.getId()], baseStrokeSat, baseStrokeBright, mlStrokeOpac);
 		}
 		else {
@@ -296,7 +296,7 @@ public class MorphOSCView {
 
 		//draw handles (when over)
 		grandparent.pushStyle();
-		if (ml_.isOverHandle) {
+		if (ml_.isOverHandle&&!parent.IsLocked) {
 			//System.out.println("Showing Handle");
 			grandparent.stroke(mlHues[ml_.getId()], baseStrokeSat, baseStrokeBright, mlStrokeOpac);
 			grandparent.strokeWeight(mlStrokeWeight);
@@ -322,7 +322,7 @@ public class MorphOSCView {
 		grandparent.noStroke();
 		for(int j =0;j<ml_.maList.size();j+=1){		
 			MorphAnchor ma = ml_.maList.get(j);
-			grandparent.ellipse(ma.getPosition().x, ma.getPosition().y, 10, 10); //draw a circle at the anchor point
+			grandparent.ellipse(ma.getPosition().x, ma.getPosition().y, anchorSize, anchorSize); //draw a circle at the anchor point
 			//parent.text(""+ma.getPosition().x + ma.getPosition().y, ma.getPosition().x, ma.getPosition().y); 
 			if (verboseMode) {
 				for(int k=0;k<ma.valueList.size();k+=1){ //TODO: change to method getValueList
@@ -363,7 +363,10 @@ public class MorphOSCView {
 		PVector szSize = mpDrag.getSelectZone().getSize();
 		PVector mV = parent.getMouseVector();
 		grandparent.fill(mpHues[mpDrag.getId()], baseFillSat, baseStrokeSat);
-		grandparent.rect(mV.x, mV.y, szSize.x, szSize.y); // show rect being dragged
+		grandparent.rect(mV.x, mV.y, dragSwatchSize, dragSwatchSize); // show rect being dragged
+		grandparent.fill(255);
+		grandparent.textFont(font);
+		grandparent.text(mpDrag.getId(),mV.x, mV.y);
 		grandparent.popStyle();
 	}
 
@@ -371,11 +374,15 @@ public class MorphOSCView {
 		grandparent.pushStyle();
 		grandparent.noStroke();
 		grandparent.rectMode(PApplet.CENTER);
-		MorphParameter mpVDrag = parent.mpList.get(parent.dragMParamID);
-		PVector szSize = mpVDrag.getValueZone().getSize();
+		MorphParameter mpVDrag = parent.mpList.get(parent.draggingMPValue);
+		//PVector szSize = mpVDrag.getValueZone().getSize();
 		PVector mV = parent.getMouseVector();
 		grandparent.fill(mpHues[mpVDrag.getId()], baseFillSat, baseStrokeSat);
-		grandparent.rect(mV.x, mV.y, szSize.x, szSize.y); // show rect being dragged
+		//grandparent.rect(mV.x, mV.y, szSize.x, szSize.y); // show rect being dragged
+		grandparent.rect(mV.x, mV.y, dragSwatchSize, dragSwatchSize);
+		grandparent.fill(255);
+		grandparent.textFont(font);
+		grandparent.text(mpVDrag.getId(),mV.x, mV.y);
 		grandparent.popStyle();
 
 	}
@@ -395,6 +402,8 @@ public class MorphOSCView {
 	void setStrokeByID(int id_){
 
 	}
+	
+	
 //////////////////////////////////////////////////////////////////////////////color management
 	private byte[] shuffle(byte[] byteArray) {
 		final Random randGenerator = new Random();;    
