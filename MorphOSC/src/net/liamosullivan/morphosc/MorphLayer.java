@@ -80,8 +80,8 @@ public class MorphLayer extends InteractiveLayer
 
 	void moveMorphAnchor(int ix_, int iy_)
 	{
-		int ix = ix_;
-		int iy = iy_;
+		//int ix = ix_;
+		//int iy = iy_;
 	}
 	protected ArrayList getMAList(){
 		return maList;	
@@ -103,7 +103,7 @@ public class MorphLayer extends InteractiveLayer
 
 	boolean checkOnPNode(int x_, int y_) {
 		for (int j = 0; j < this.maList.size(); j++) {
-			MorphAnchor localMorphAnchor = (MorphAnchor)this.maList.get(j);
+			//MorphAnchor localMorphAnchor = (MorphAnchor)this.maList.get(j);
 		}
 		return false;
 	}
@@ -140,7 +140,7 @@ public class MorphLayer extends InteractiveLayer
 			//System.out.print("\t " +parent.nf(dists[i], 2, 2));
 		}
 		System.out.println();
-		float mx = parent.max(dists);
+		float mx = PApplet.max(dists);
 		//System.out.println("max: "+mx);
 		//System.out.print("Inverse Distance Values :");
 		for (int i=0; i<maList.size(); i+=1) {
@@ -180,7 +180,7 @@ public class MorphLayer extends InteractiveLayer
 	public void resizeContents(PVector sf_)
 	{
 		PVector scaler = sf_;
-		System.out.println("scaleX "+scaler.x+"scaleY "+scaler.y);
+		//System.out.println("scaleX "+scaler.x+"scaleY "+scaler.y);
 		for(int i =0;i<maList.size();i+=1){
 			MorphAnchor ma = maList.get(i);
 			ma.setPosition(new PVector (ma.getPosition().x*=scaler.x, ma.getPosition().y*=scaler.y));

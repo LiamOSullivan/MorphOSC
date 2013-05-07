@@ -2,20 +2,19 @@ package net.liamosullivan.morphosc;
 
 import controlP5.ControlEvent;
 import controlP5.Controller;
-import controlP5.Toggle;
 import controlP5.Slider;
 import controlP5.ControlP5;
-import java.io.PrintStream;
+//import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import processing.core.PApplet;
-import processing.core.PImage;
+//import processing.core.PImage;
 import processing.core.PConstants;
 import processing.core.PVector;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent; 
 import oscP5.*;
-import netP5.NetAddress;
+//import netP5.NetAddress;
 
 /*TODO:
  * Add ability to drag multiple parameters to a layer at once e.g. using multi-select.
@@ -37,7 +36,7 @@ public class MorphOSC implements PConstants {
 	private float lockX, lockY; // position of the GUI lock/unlock button
 	int lockImageScale = 4;
 	List<Controller> cList = new ArrayList();
-	List<MorphParameter> mpList = new ArrayList();
+	List<MorphParameter> mpList = new ArrayList<MorphParameter>();
 	List<MorphLayer> mlList = new ArrayList<MorphLayer>();
 	List<SafeZone> sZoneList = new ArrayList<SafeZone>();
 	// List <Integer> dragIds = new ArrayList <Integer>(); //list of paramIDs
@@ -338,30 +337,19 @@ public class MorphOSC implements PConstants {
 
 	public void controlEvent(ControlEvent e){
 		//
-		//		System.out.println("Control event in MorphOSC from "
-		//				+ e.getController().getName());
-		//		System.out.println("Controller no. is "
-		//				+ e.getController().getId());
+		System.out.println("Control event in MorphOSC from "
+						+ e.getController().getName());
+				System.out.println("Controller no. is "
+						+ e.getController().getId());
 
 		int index = getMPIndexById(e.getController().getId());
-		//		System.out.println("...index is "+index);
-		if(e.isController()	&& index >= 0){
+				System.out.println("...index is "+index);
+		if(e.isController()	&& e.getName()!="Lock"){
 			mpList.get(index).setVZValue(e.getController().getValue());
 		}
-	}
-
-	protected void updateController(ControlEvent e) {
-
-
-		int index = getMPIndexById(e.getController().getId());
-		if(index!=-1){
-
-
+		else if(e.isController() && e.getName()=="Lock"){
+			IsLocked= !IsLocked;
 		}
-	}
-
-	private void relay(){
-
 	}
 
 	protected void addMouseHandler(){
@@ -392,6 +380,8 @@ public class MorphOSC implements PConstants {
 		oscA.setMessage(msg_);
 		oscA.send();
 	}
+	
+	/////////////////////////////////////////////////////////////////////Public Methods
 
 	public void setUseSoftwareBus(boolean in){
 		useSoftwareBus=in;	
@@ -417,6 +407,52 @@ public class MorphOSC implements PConstants {
 	public void setVerboseMode(boolean mode_){
 
 		gui.verboseMode=mode_;
+	}
+	
+	public int getOSCListenPort(){
+		
+		return oscA.listenPort;
+	}
+	public void setOSCListenPort(int listenPort_) {
+		oscA.listenPort = listenPort_;
+		//println("Changing OSC listening port to "+listenPort);
+		oscA.portInit();
+	}
+	public int getOSCSendPort(){
+
+		return oscA.sendPort;
+	}
+	
+	public void setOscSendPort(int sendPort_) {
+		oscA.sendPort = sendPort_;
+		//println("Changing OSC sending port to "+sendPort);
+		oscA.addrInit();
+	}
+	
+	public String getOSCLocalAddr(){
+		return oscA.localAddrString;
+		
+	}
+	
+	public void setOSCLocalAddr(String localAddrString_) {
+		oscA.localAddrString =localAddrString_;
+		//println("Changing OSC local address to "+localAddrString);
+		// No need to re-initalise OSC as listen port is not being changed.
+	}
+	
+	public String getOSCRemoteAddr(){
+		return oscA.localAddrString;
+		
+	}
+	
+	public void setOSCRemoteAddr(String remoteAddrString_) {
+		oscA.remoteAddrString =remoteAddrString_;
+		//println("Changing OSC remote address to "+remoteAddrString);
+		oscA.addrInit();
+	}
+	public void verifyOSC(){
+		OscMessage verify = new OscMessage("OSC communication verify test");
+		relayOSCMessage(verify);
 	}
 
 

@@ -2,9 +2,9 @@ package net.liamosullivan.morphosc;
 
 import processing.core.*;
 import controlP5.*;
-import java.awt.Frame;
-import java.awt.BorderLayout;
-import processing.core.PConstants;
+//import java.awt.Frame;
+//import java.awt.BorderLayout;
+//import processing.core.PConstants;
 import java.util.*;
 
 
@@ -60,8 +60,9 @@ public class MorphOSCView {
 		lockToggle = cp5View.addToggle("Lock")
 				.setPosition(100, grandparent.height-100)
 				.setSize(25,25);
-		lockToggle.setId(parent.sZoneList.size());
-		SafeZone szlock = new SafeZone(grandparent, parent.sZoneList.size(), lockToggle.getPosition().x, lockToggle.getPosition().y,
+		//lockToggle.setId(parent.sZoneList.size());
+		lockToggle.setId(0);
+		SafeZone szlock = new SafeZone(grandparent, 0, lockToggle.getPosition().x, lockToggle.getPosition().y,
 				(float) lockToggle.getWidth(), (float) lockToggle.getHeight()); //GUI lock
 		parent.sZoneList.add(szlock); 
 	}
@@ -69,14 +70,14 @@ public class MorphOSCView {
 	private byte[] generateHues(int max_) {
 		int max = max_;
 		byte hueStep = (byte)PApplet.floor(255 / (max));
-		System.out.println("Hue Step is " +hueStep);
+		//System.out.println("Hue Step is " +hueStep);
 		byte [] hues = new byte[max];
 		for (int i = 0; i < max; i+=1) {
 			hues[i] = (byte)(hueStep*i); //gives larger hue changes for low numbers of params, then wraps around
 			if(hues[i]<0){
 				hues[i]+=128;
 			}
-			System.out.println("Hue #" + i + ": " + hues[i]);
+			//System.out.println("Hue #" + i + ": " + hues[i]);
 			//grandparent.cp5.getController().setColor(hues[i]);
 		}
 		return hues;
@@ -184,7 +185,7 @@ public class MorphOSCView {
 		grandparent.fill(255,200);
 		grandparent.textSize((p_.getValueZone().getSize().y/2));
 		grandparent.textAlign(PApplet.LEFT);
-		grandparent.text(grandparent.nf(p_.getValueZone().getValue(), 3, 1),
+		grandparent.text(PApplet.nf(p_.getValueZone().getValue(), 1, 3),
 				p_.getValueZone().getPosition().x+mpvStrokeWeight, 
 				p_.getValueZone().getPosition().y+mpvStrokeWeight+p_.getValueZone().getSize().y/2);
 		grandparent.popStyle();
@@ -280,9 +281,9 @@ public class MorphOSCView {
 			//grandparent.text(""+mp.getId(), (j+1)*barH-ml_.halfWidth,-ml_.halfHeight); //place MP swatches on top bar
 
 		}
-		grandparent.noFill();
-		grandparent.textSize(anchorTextSize);
-		grandparent.ellipseMode(grandparent.CENTER);
+		//grandparent.noFill();
+		//grandparent.textSize(anchorTextSize);
+		//grandparent.ellipseMode(PApplet.CENTER);
 		grandparent.popStyle();
 
 		//draw layer ID number
@@ -290,7 +291,7 @@ public class MorphOSCView {
 		grandparent.strokeWeight(3.0F);
 		grandparent.textAlign(PApplet.LEFT);
 		grandparent.textFont(font, layerTextSize);
-		grandparent.fill(mlHues[ml_.getId()], baseFillSat, baseFillBright);
+		grandparent.fill(mlHues[ml_.getId()], baseFillSat, baseFillBright,mlStrokeOpac);
 		grandparent.text(ml_.id, ml_.halfWidth-layerTextSize,ml_.halfHeight-ml_.layerTextSize/2);
 		grandparent.popStyle();
 
@@ -300,18 +301,12 @@ public class MorphOSCView {
 			//System.out.println("Showing Handle");
 			grandparent.stroke(mlHues[ml_.getId()], baseStrokeSat, baseStrokeBright, mlStrokeOpac);
 			grandparent.strokeWeight(mlStrokeWeight);
-			grandparent.textFont(font, dialogTextSize);
+			//grandparent.textFont(font, dialogTextSize);
 			//grandparent.fill(mlHues[ml_.getId()], baseFillSat, baseFillBright);
 			grandparent.noFill();
-			grandparent.ellipseMode(parent.CENTER);
+			grandparent.ellipseMode(PApplet.CENTER);
 			grandparent.ellipse(ml_.handleX[ml_.handleId], ml_.handleY[ml_.handleId], ml_.handleSize, ml_.handleSize);
-			//			if (verboseMode) {
-			//				grandparent.fill(255);
-			//				grandparent.textAlign(3);
-			//				grandparent.text("w: " + ml_.lWidth, ml_.lx, ml_.handleY[0]);
-			//				grandparent.text("h: " + ml_.lHeight, ml_.handleX[0], ml_.ly);
-			//				grandparent.text("(" + ml_.lx + ", " + ml_.ly + ")", ml_.lx, ml_.ly);
-			//			}
+		
 		}
 		grandparent.popStyle();
 
@@ -320,6 +315,7 @@ public class MorphOSCView {
 		grandparent.pushStyle();
 		grandparent.fill(mlHues[ml_.getId()], baseFillSat, baseFillBright);
 		grandparent.noStroke();
+		grandparent.textAlign(PApplet.RIGHT);
 		for(int j =0;j<ml_.maList.size();j+=1){		
 			MorphAnchor ma = ml_.maList.get(j);
 			grandparent.ellipse(ma.getPosition().x, ma.getPosition().y, anchorSize, anchorSize); //draw a circle at the anchor point
@@ -360,7 +356,7 @@ public class MorphOSCView {
 		grandparent.noStroke();
 		grandparent.rectMode(PApplet.CENTER);
 		MorphParameter mpDrag = parent.mpList.get(parent.dragMParamID);
-		PVector szSize = mpDrag.getSelectZone().getSize();
+		//PVector szSize = mpDrag.getSelectZone().getSize();
 		PVector mV = parent.getMouseVector();
 		grandparent.fill(mpHues[mpDrag.getId()], baseFillSat, baseStrokeSat);
 		grandparent.rect(mV.x, mV.y, dragSwatchSize, dragSwatchSize); // show rect being dragged

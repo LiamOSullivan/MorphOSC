@@ -1,18 +1,18 @@
 package net.liamosullivan.morphosc;
 
-import controlP5.ControlEvent;
-import controlP5.Controller;
-import java.io.PrintStream;
+//import controlP5.ControlEvent;
+//import controlP5.Controller;
+//import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.List;
-import processing.core.PApplet;
-import processing.core.PImage;
-import processing.core.PConstants;
+//import java.util.List;
+//import processing.core.PApplet;
+//import processing.core.PImage;
+//import processing.core.PConstants;
 import processing.core.PVector;
-import processing.event.KeyEvent;
-import processing.event.MouseEvent;
+//import processing.event.KeyEvent;
+//import processing.event.MouseEvent;
 import oscP5.*;
-import netP5.*;
+//import netP5.*;
 
 public class MorphOSCController {
 
@@ -37,9 +37,11 @@ public class MorphOSCController {
 				SafeZone sz = parent.sZoneList.get(i);
 				if (sz.select(v)) {
 					//					//System.out.println("Safe Zone " + sz.getId() + " selected");
-					if(sz.getId()==0){ //safe 0 is GUI lock toggle
-						parent.IsLocked=!parent.IsLocked;
-					}
+//					System.out.println("SZone# "+sz.getId());
+//					if(sz.getId()==0){ //safe 4 is GUI lock toggle
+//						System.out.println("Unlock!");
+//						parent.IsLocked=!parent.IsLocked;
+//					}
 					keepChecking = false;
 
 				}
@@ -87,9 +89,9 @@ public class MorphOSCController {
 				SafeZone sz = parent.sZoneList.get(i);
 				if (sz.select(v)) {
 					//					//System.out.println("Safe Zone " + sz.getId() + " selected");
-					if(sz.getId()==0){ //safe 0 is GUI lock toggle
-						parent.IsLocked=!parent.IsLocked;
-					}
+//					if(sz.getId()==0){ //safe 0 is GUI lock toggle
+//						parent.IsLocked=!parent.IsLocked;
+//					}
 					keepChecking = false;
 
 				}
@@ -133,6 +135,8 @@ public class MorphOSCController {
 					keepChecking = false;
 					parent.resizeLayer = i;
 					parent.layerIsResizing = true;
+					tl.isOverHandle=true;
+					tl.isOverLayer=true;
 				}
 			}
 			// Check if over a MorphLayer Bar
@@ -143,6 +147,8 @@ public class MorphOSCController {
 					keepChecking = false;
 					parent.movingLayer = i;
 					parent.layerIsMoving = true;
+					tl.isOverLayer=true;
+					tl.isOverLayerBar = true;
 					tl.setStartPosition(v);
 				}
 			}
@@ -150,6 +156,7 @@ public class MorphOSCController {
 			for (int i = parent.nMLayers-1 ; i >= 0 && keepChecking; i--) {
 				MorphLayer tl = parent.mlList.get(i);
 				if (tl.select(v)) {
+					tl.isOverLayer=true;
 					////System.out.println(" Layer " + i + " selected");
 					// Check if over a MorphAnchor on this layer
 					ArrayList mal = tl.getMAList();   
@@ -359,6 +366,9 @@ public class MorphOSCController {
 		if (parent.layerIsResizing) {
 			MorphLayer tl = parent.mlList.get(parent.resizeLayer);
 			parent.layerIsResizing = false;
+			tl.isOverLayer=false;
+			tl.isOverLayerBar=false;
+			tl.isOverHandle=false;
 		}
 		parent.layerIsMoving = false;
 
@@ -367,6 +377,9 @@ public class MorphOSCController {
 		for (int i = 0; i < parent.mlList.size(); i += 1) {
 			MorphLayer tl = parent.mlList.get(i);
 			tl.isDraggingOnLayer = false;
+			tl.isOverLayer=false;
+			tl.isOverLayerBar=false;
+			tl.isOverHandle=false;
 		}
 
 	}

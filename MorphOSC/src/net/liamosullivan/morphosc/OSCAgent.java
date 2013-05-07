@@ -20,7 +20,6 @@ public class OSCAgent {
 		listenPort = 8000;
 		sendPort = 8001;
 		localAddrString = getLocalAddress(); //returns loopback address
-		//localAddrString = "192.168.1.11";
 		remoteAddrString = "127.0.0.1";
 		//remoteAddrString = "192.168.42.29"; //laptop using ethernet tether
 		debugString = "OSC ok!";
@@ -30,47 +29,7 @@ public class OSCAgent {
 	}
 	//Open Sound Control//////////////////////////////////////////////////////////////
 	//Methods to change OSC addresses and port based on OSCSettings menu fields
-		int getOSCListenPort(){
-	
-			return listenPort;
-		}
-		void setOSCListenPort(int listenPort_) {
-			listenPort = listenPort_;
-			//println("Changing OSC listening port to "+listenPort);
-			portInit();
-		}
-		int getOSCSendPort(){
-	
-			return sendPort;
-		}
 		
-		void setOscSendPort(int sendPort_) {
-			sendPort = sendPort_;
-			//println("Changing OSC sending port to "+sendPort);
-			addrInit();
-		}
-		
-		String getOSCLocalAddr(){
-			return localAddrString;
-			
-		}
-		
-		void setOSCLocalAddr(String localAddrString_) {
-			localAddrString =localAddrString_;
-			//println("Changing OSC local address to "+localAddrString);
-			// No need to re-initalise OSC as listen port is not being changed.
-		}
-		
-		String getOSCRemoteAddr(){
-			return localAddrString;
-			
-		}
-		
-		void setOSCRemoteAddr(String remoteAddrString_) {
-			remoteAddrString =remoteAddrString_;
-			//println("Changing OSC remote address to "+remoteAddrString);
-			addrInit();
-		}
 	
 	void portInit() {
 		/* This must be called at setup and whenever a port number is changed.*/
