@@ -27,7 +27,7 @@ void setup() {
   s1 = cp5.addSlider("S1")
     .setId(0)
       .setPosition(sliderX, sliderY)
-        .setRange(0, 100)
+        .setRange(0.0, 1.0)
           .setHeight(sliderH)
             .setWidth(sliderW);
 
@@ -37,7 +37,7 @@ void setup() {
   s2 = cp5.addSlider("S2")
     .setId(1)
       .setPosition(sliderX, sliderY)
-        .setRange(0, 100)
+        .setRange(0.0, 1.0)
           .setHeight(sliderH)
             .setWidth(sliderW)
               ;
@@ -46,7 +46,7 @@ void setup() {
   s3 = cp5.addSlider("S3")
     .setId(2)
       .setPosition(sliderX, sliderY)
-        .setRange(0, 100)
+        .setRange(0.0, 1.0)
           .setHeight(sliderH)
             .setWidth(sliderW);
 
@@ -56,7 +56,7 @@ void setup() {
   s4 = cp5.addSlider("S4")
     .setId(3)
       .setPosition(sliderX, sliderY)
-        .setRange(0, 100)
+        .setRange(0.0, 1.0)
           .setHeight(sliderH)
             .setWidth(sliderW) ;
 

@@ -50,18 +50,23 @@ public class MorphOSCController {
 			for (int i = parent.nMLayers - 1; i >= 0 && keepChecking; i--) {
 				MorphLayer ml = parent.mlList.get(i);
 				if (ml.select(v)) {
-					OscMessage omsg = new OscMessage("/morphosc");
-					omsg.add(ml.getId());
-					omsg.add(ml.getNMPs()); //add the number of MPs so that they can be parsed at OSC server
+					//For FM synth: paramID, value, layer ID
+					//OscMessage omsg;
+					//OscMessage omsg = new OscMessage("/morphOSC");
+					//omsg.add(ml.getId());
+					//omsg.add(ml.getNMPs()); //add the number of MPs so that they can be parsed at OSC server
 					if(ml.getNMAs()>1){ //only try to interpolate if 2 or more anchors present in layer.
 						MorphParameter [] interps = ml.interpolate(v);
 						////System.out.print("Interpolating Values :");
 						for(int j=0;j<interps.length;j+=1){
+							OscMessage omsg = new OscMessage("/morphOSC");
 							omsg.add(interps[j].getId());							
 							omsg.add(interps[j].getValue());
+							omsg.add(ml.getId());
+							relayOSCMessage(omsg);
 						}
 						////System.out.println();
-						relayOSCMessage(omsg);
+						//relayOSCMessage(omsg);
 						parent.gui.drawInterpPoint(v);
 					}
 
@@ -416,9 +421,9 @@ public class MorphOSCController {
 					//from anchors.
 					if (ml.select(v)) {
 						//String msg = "layer"+i;
-						OscMessage omsg = new OscMessage("/morphOSC");
-						omsg.add(ml.getId());
-						omsg.add(ml.getNMPs()); //add the number of MPs so that they can be parsed at OSC server
+						//OscMessage omsg = new OscMessage("/morphOSC");
+						//omsg.add(ml.getId());
+						//omsg.add(ml.getNMPs()); //add the number of MPs so that they can be parsed at OSC server
 						//						//System.out.print("Layer " + i + " selected");
 						//						//System.out.println(" has " + ml.getNMAs() + " anchors");
 						if(ml.getNMAs()>1){ //only try to interpolate if 2 or more anchors present in layer.
@@ -430,12 +435,16 @@ public class MorphOSCController {
 								//+interps[j].getId() +"\t "
 								//+PApplet.nf(interps[j].getValue(), 2, 2)+"\t "
 								//);
-
+								//note that drag is called on mouse up
+								OscMessage omsg = new OscMessage("/morphOSCdrag");
 								omsg.add(interps[j].getId());							
 								omsg.add(interps[j].getValue());
+								omsg.add(ml.getId());
+								relayOSCMessage(omsg);
+								
 							}
 							//System.out.println();
-							relayOSCMessage(omsg);
+							//relayOSCMessage(omsg);
 
 						}
 
