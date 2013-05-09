@@ -344,10 +344,10 @@ public class MorphOSC implements PConstants {
 
 		int index = getMPIndexById(e.getController().getId());
 				System.out.println("...index is "+index);
-		if(e.isController()	&& e.getName()!="Lock"){
+		if(index!=-1 && e.isController()	&& e.getName()!="Lock"){
 			mpList.get(index).setVZValue(e.getController().getValue());
 		}
-		else if(e.isController() && e.getName()=="Lock"){
+		else if(index!=-1 && e.isController() && e.getName()=="Lock"){
 			IsLocked= !IsLocked;
 		}
 	}
@@ -453,6 +453,18 @@ public class MorphOSC implements PConstants {
 	public void verifyOSC(){
 		OscMessage verify = new OscMessage("OSC communication verify test");
 		relayOSCMessage(verify);
+	}
+	
+	public void setAndroidMode(boolean bIn_){
+		//TODO: Use to determine subset of interactions in Controller 
+		//for Android e.g. replacement for mouseMoved etc.
+		if(bIn_){
+		System.out.println("Android mode set");
+		
+		}
+		else {
+			System.out.println("Desktop mode set");
+		}
 	}
 
 

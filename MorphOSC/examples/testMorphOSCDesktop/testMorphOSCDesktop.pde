@@ -1,5 +1,5 @@
 /*
-Test sketch for Desktop MorphOSC
+Test sketch for MorphOSC
  
  */
 import net.liamosullivan.morphosc.*;
@@ -8,14 +8,14 @@ import controlP5.*;
 MorphOSC m;
 ControlP5 cp5;
 Slider s1, s2, s3, s4;
-int sliderX = 50, sliderY = 20;
+int sliderX = 50, sliderY = 20, sliderH = 40, sliderW= 160;
 Button b;
 
 PFont font;
 int fps = 50; //target framerate
 int fr=0; //actual framerate
 void setup() {
-  size(800, 600);
+  size(1000,800);
   background(0);
   frameRate(fps);
   font=createFont("ArialMT-48.vlw", 48);
@@ -23,48 +23,64 @@ void setup() {
 
   cp5 = new ControlP5(this);
   m = new MorphOSC(this);
+  m.setOSCListenPort(8000);
+  m.setOscSendPort(8001);
+  //m.setOSCLocalAddr("127.0.0.1");
+  m.setOSCRemoteAddr("127.0.0.1");
+  //m.setOSCRemoteAddr("192.168.42.160"); //usb tethering
+  m.setAndroidMode(false);
+  
+  
   //Create some ControlP5 GUI elements...
   s1 = cp5.addSlider("S1")
     .setId(0)
       .setPosition(sliderX, sliderY)
-        .setRange(0, 100)
-        .setHeight(20);
-          
+        .setRange(0.0, 1.0)
+          .setHeight(sliderH)
+            .setWidth(sliderW);
+
 
   sliderY += 2*s1.getHeight();
 
   s2 = cp5.addSlider("S2")
     .setId(1)
-    .setHeight(20)
       .setPosition(sliderX, sliderY)
-        .setRange(0, 100)
-          ;
+        .setRange(0.0, 1.0)
+          .setHeight(sliderH)
+            .setWidth(sliderW)
+              ;
   sliderY += 2*s1.getHeight();
 
   s3 = cp5.addSlider("S3")
     .setId(2)
-    .setHeight(20)
       .setPosition(sliderX, sliderY)
-        .setRange(0, 100)
-          ;
+        .setRange(0.0, 1.0)
+          .setHeight(sliderH)
+            .setWidth(sliderW);
+
 
   sliderY += 2*s1.getHeight();
 
   s4 = cp5.addSlider("S4")
     .setId(3)
-    .setHeight(20)
       .setPosition(sliderX, sliderY)
-        .setRange(0, 100)
-          ;
+        .setRange(0.0, 1.0)
+          .setHeight(sliderH)
+            .setWidth(sliderW) ;
 
   //Add elements to MorphOSC...  
-//  m.addController(s1); //add s1 to MorphOSC
-//  m.addController(s2);
-//  m.addController(s3);
-//  m.addController(s4);
-m.addAllControllers(cp5);
+  //  m.addController(s1); //add s1 to MorphOSC
+  //  m.addController(s2);
+  //  m.addController(s3);
+  //  m.addController(s4);
+  m.addAllControllers(cp5); //add all silders to MorphOSC
   m.getControllerInfo(); //print the controllers added to MorphOSC only
   m.addMorphLayer(width/2, height/2); //MorphLayer can be added in the sketch or via interaction at runtime
+  m.setVerboseMode(false); //set true for more detailed output
+ // m.verifyOSC();
+  
+  
+  
 }
 
 void draw() {
@@ -72,8 +88,7 @@ void draw() {
   showFramerate();
 }
 
-void mousePressed() {
-}
+
 
 void controlEvent(ControlEvent e) {
   if (e.isGroup()) {
@@ -87,8 +102,7 @@ void controlEvent(ControlEvent e) {
 }
 
 //Callback method for in-sketch control
-void morphOSCEvent(){
-  
+void morphOSCEvent() {
 }
 
 void showFramerate() {

@@ -28,6 +28,8 @@ void setup() {
   //m.setOSCLocalAddr("127.0.0.1");
   //m.setOSCRemoteAddr("127.0.0.1");
   m.setOSCRemoteAddr("192.168.42.160"); //usb tethering
+  //m.setAndroidMode(true);
+  
   //Create some ControlP5 GUI elements...
   s1 = cp5.addSlider("S1")
     .setId(0)
