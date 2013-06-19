@@ -49,7 +49,7 @@ public class MorphOSCController {
 			//Press on layers when locked to produce interpolated values
 			//from anchors.
 
-			for (int i = parent.nMLayers - 1; i >= 0 && keepChecking; i--) {
+			for (int i = parent.nMLayers - 1; i >= 0; i--) {
 				MorphLayer ml = parent.mlList.get(i);
 				if (ml.select(v)) {
 					//For FM synth: paramID, value, layer ID
@@ -73,11 +73,11 @@ public class MorphOSCController {
 					}
 
 				}
-				keepChecking = false; //place inside above condition?
-			}
-			if (keepChecking) {
-				// //System.out.println(" Free space ");
-			}
+				//keepChecking = false; //place inside above condition?
+			} //End Layer For Loop
+//			if (keepChecking) {
+//				// //System.out.println(" Free space ");
+//			}
 
 		}  
 		////////////////////////////////////////////////////////////////// GUI Unlocked

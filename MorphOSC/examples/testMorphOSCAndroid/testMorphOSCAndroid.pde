@@ -25,10 +25,8 @@ void setup() {
   m = new MorphOSC(this);
   m.setOSCListenPort(8000);
   m.setOscSendPort(8001);
-  //m.setOSCLocalAddr("127.0.0.1");
-  //m.setOSCRemoteAddr("127.0.0.1");
-  m.setOSCRemoteAddr("192.168.42.160"); //usb tethering
-  //m.setAndroidMode(true);
+  m.setOSCRemoteAddr("192.168.173.1"); //usb tethering
+  m.setAndroidMode(true);
   
   //Create some ControlP5 GUI elements...
   s1 = cp5.addSlider("S1")
@@ -68,15 +66,11 @@ void setup() {
             .setWidth(sliderW) ;
 
   //Add elements to MorphOSC...  
-  //  m.addController(s1); //add s1 to MorphOSC
-  //  m.addController(s2);
-  //  m.addController(s3);
-  //  m.addController(s4);
   m.addAllControllers(cp5); //add all silders to MorphOSC
   m.getControllerInfo(); //print the controllers added to MorphOSC only
   m.addMorphLayer(width/2, height/2); //MorphLayer can be added in the sketch or via interaction at runtime
   m.setVerboseMode(false); //set true for more detailed output
- // m.verifyOSC();
+   // m.verifyOSC();
   
   
   
@@ -84,7 +78,7 @@ void setup() {
 
 void draw() {
   //background(0);
-  showFramerate();
+  //showFramerate();
 }
 
 
